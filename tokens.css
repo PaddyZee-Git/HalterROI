@@ -1,0 +1,271 @@
+/* ============================================================
+   HALTER — DESIGN TOKENS
+   Source: Halter Brand Guidelines, June 2025
+   ============================================================ */
+
+/* ---------- Typeface: PP Neue Montreal ----------
+   Local files in /fonts. Full family: Thin (100), Light (300),
+   Book (350), Regular (400), Medium (500), SemiBold (600), Bold (700)
+   — each with its italic.
+*/
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-Thin.otf") format("opentype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-ThinItalic.otf") format("opentype");
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-LightItalic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-Book.otf") format("opentype");
+  font-weight: 350;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-BookItalic.otf") format("opentype");
+  font-weight: 350;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-MediumItalic.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-SemiBolditalic.otf") format("opentype");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("./fonts/PPNeueMontreal-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* ---------- COLOR — Primary ---------- */
+  --halter-green:       #294E3B;   /* Primary. PMS 7734 */
+
+  /* ---------- COLOR — Secondary ---------- */
+  --halter-cactus:      #4F7359;   /* PMS 555 */
+
+  /* ---------- COLOR — Tertiary (greens) ---------- */
+  --halter-mantis:      #6FBE84;   /* PMS 2284 */
+  --halter-sage:        #B9D49C;   /* PMS 2249 */
+  --halter-lime:        #C7EA9D;   /* PMS 2282 */
+  --halter-mint-cream:  #E7F5EA;   /* PMS 621 */
+  --halter-platinum:    #F7F5F1;   /* Warm Gray 1 */
+
+  /* ---------- COLOR — Complementary ---------- */
+  --halter-beef:        #FDF9EF;   /* warm off-white */
+  --halter-sky:         #AAD6F4;   /* PMS 2905 */
+  --halter-navy:        #293C4E;   /* PMS 7546 */
+
+  /* ---------- COLOR — Functional neutrals (system additions) ----- */
+  --halter-ink:         #1A2A22;   /* near-black derived from green */
+  --halter-graphite:    #6F7B74;
+  --halter-mist:        #DFE1E4;
+  --halter-white:       #FFFFFF;
+
+  /* Semantic (system additions for UI) */
+  --halter-success:     var(--halter-mantis);
+  --halter-warning:     #E8B048;
+  --halter-danger:      #C9523F;
+
+  /* ---------- TYPOGRAPHY ---------- */
+  --font-sans: "PP Neue Montreal", ui-sans-serif, system-ui, -apple-system,
+               "Helvetica Neue", Arial, sans-serif;
+
+  /* Type scale — generous, agricultural editorial feel */
+  --type-display:   clamp(64px, 9vw, 160px);
+  --type-h1:        clamp(48px, 6vw, 96px);
+  --type-h2:        clamp(36px, 4.5vw, 64px);
+  --type-h3:        28px;
+  --type-h4:        22px;
+  --type-eyebrow:   13px;
+  --type-body-lg:   20px;
+  --type-body:      17px;
+  --type-small:     14px;
+  --type-caption:   12px;
+
+  /* Tracking */
+  --track-tight:    -0.025em;
+  --track-snug:     -0.015em;
+  --track-normal:   0em;
+  --track-wide:     0.04em;
+  --track-eyebrow:  0.12em;
+
+  /* Leading */
+  --lh-tight:       0.95;
+  --lh-snug:        1.08;
+  --lh-normal:      1.45;
+  --lh-loose:       1.6;
+
+  /* ---------- SPACING ---------- */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+  --space-9:  96px;
+  --space-10: 128px;
+
+  /* ---------- RADII ---------- */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* ---------- SHADOWS ---------- */
+  --shadow-sm:  0 1px 2px rgba(41,78,59,0.06), 0 1px 1px rgba(41,78,59,0.04);
+  --shadow-md:  0 4px 12px rgba(41,78,59,0.08), 0 2px 4px rgba(41,78,59,0.04);
+  --shadow-lg:  0 16px 40px rgba(41,78,59,0.12), 0 4px 12px rgba(41,78,59,0.06);
+  --shadow-xl:  0 28px 80px rgba(41,78,59,0.18);
+
+  /* ---------- LAYOUT ---------- */
+  --max-page: 1280px;
+  --gutter: clamp(20px, 4vw, 64px);
+}
+
+/* ---------- BASE ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--type-body);
+  line-height: var(--lh-normal);
+  color: var(--halter-ink);
+  background: var(--halter-beef);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 500; }
+p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+button { font: inherit; cursor: pointer; }
+
+/* ---------- UTILITY: TEXT STYLES ---------- */
+.t-eyebrow {
+  font-size: var(--type-eyebrow);
+  text-transform: uppercase;
+  letter-spacing: var(--track-eyebrow);
+  font-weight: 500;
+  color: var(--halter-cactus);
+}
+.t-display {
+  font-size: var(--type-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--track-tight);
+  font-weight: 500;
+}
+.t-h1 {
+  font-size: var(--type-h1);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--track-tight);
+  font-weight: 500;
+}
+.t-h2 {
+  font-size: var(--type-h2);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--track-snug);
+  font-weight: 500;
+}
+.t-h3 {
+  font-size: var(--type-h3);
+  line-height: 1.18;
+  letter-spacing: var(--track-snug);
+  font-weight: 500;
+}
+.t-h4 {
+  font-size: var(--type-h4);
+  line-height: 1.25;
+  font-weight: 500;
+}
+.t-body-lg {
+  font-size: var(--type-body-lg);
+  line-height: var(--lh-loose);
+}
+.t-body { font-size: var(--type-body); line-height: var(--lh-normal); }
+.t-small { font-size: var(--type-small); line-height: 1.5; }
+.t-caption {
+  font-size: var(--type-caption);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+}
+.t-mono {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}

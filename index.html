@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Halter — Dairy ROI calculator · NZ</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Halter ROI">
+<meta name="theme-color" content="#FDF9EF">
+<meta name="description" content="Halter NZ dairy ROI calculator — estimate the annual value of Halter across pasture, reproduction, lameness, labour and winter-crop drivers.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* ============================================================
+     Halter — NZ Dairy ROI calculator
+     Built on the Halter design system (tokens.css).
+     ============================================================ */
+  :root {
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+    --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  body { background: var(--halter-beef); color: var(--halter-ink); }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px var(--gutter);
+    border-bottom: 1px solid var(--halter-mist);
+    background: var(--halter-beef);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .wordmark {
+    display: inline-flex; align-items: baseline; gap: 2px;
+    font-weight: 600; font-size: 26px; letter-spacing: -0.03em;
+    color: var(--halter-green);
+  }
+  .wordmark i { width: 8px; height: 8px; border-radius: 50%; background: var(--halter-lime);
+    display: inline-block; align-self: flex-start; margin-top: 5px; margin-left: 1px; }
+  .topbar-tag {
+    font-size: var(--type-eyebrow); text-transform: uppercase;
+    letter-spacing: var(--track-eyebrow); font-weight: 500;
+    color: var(--halter-graphite);
+  }
+
+  /* ---------- Hero / intro ---------- */
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 var(--gutter); }
+
+  /* Full-bleed photo hero with overlaid text */
+  .hero-photo { position: relative; width: 100%; height: clamp(300px, 40vw, 460px); overflow: hidden; background: var(--halter-green); }
+  .hero-photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 42%; }
+  .hero-overlay {
+    position: absolute; inset: 0; display: flex; align-items: flex-end;
+    background: linear-gradient(to top, rgba(12,20,14,0.74) 0%, rgba(12,20,14,0.28) 40%, rgba(12,20,14,0) 72%);
+  }
+  .hero-text { max-width: 1240px; width: 100%; margin: 0 auto; padding: 0 var(--gutter) 42px; }
+  .hero-eyebrow { font-size: var(--type-eyebrow); text-transform: uppercase; letter-spacing: var(--track-eyebrow); font-weight: 600; color: var(--halter-lime); }
+  .hero-text h1 {
+    color: #fff; font-size: clamp(34px, 4.6vw, 56px); line-height: 1.02;
+    letter-spacing: var(--track-tight); font-weight: 500; margin: 14px 0 0; max-width: 760px;
+  }
+  .hero-text p { font-size: var(--type-body-lg); line-height: 1.5; color: rgba(255,255,255,0.84); margin-top: 14px; max-width: 640px; }
+
+  /* ---------- Layout ---------- */
+  .layout {
+    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 28px;
+    align-items: start; padding: 36px 0 80px;
+  }
+  .panel {
+    background: var(--halter-white); border: 1px solid var(--halter-mist);
+    border-radius: var(--radius-lg); padding: 28px 30px;
+  }
+
+  /* ---------- Sections ---------- */
+  .sec { margin-bottom: 30px; }
+  .sec:last-child { margin-bottom: 0; }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .sec-num {
+    width: 24px; height: 24px; border-radius: 7px; flex: none;
+    background: var(--halter-green); color: var(--halter-lime);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+  }
+  .sec-head h2 {
+    font-size: 14px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--halter-ink); margin: 0;
+  }
+  .sec-rule { flex: 1; height: 1px; background: var(--halter-mist); }
+
+  /* ---------- Fields ---------- */
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 30px; }
+  .field { padding: 8px 0 14px; }
+  .field.col-2 { grid-column: 1 / -1; }
+  .field-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+  .field-top label { font-size: 14px; font-weight: 500; color: var(--halter-ink); }
+  .pill {
+    display: inline-flex; align-items: baseline; gap: 4px;
+    background: var(--halter-platinum); border: 1px solid var(--halter-mist);
+    border-radius: var(--radius-sm); padding: 4px 10px; min-width: 96px;
+    justify-content: flex-end; font-family: var(--mono); font-size: 13px;
+  }
+  .pill input {
+    width: 64px; text-align: right; border: 0; outline: 0; background: transparent;
+    font-family: inherit; font-size: inherit; font-weight: 500; color: var(--halter-ink);
+    padding: 0; -moz-appearance: textfield;
+  }
+  .pill input::-webkit-outer-spin-button, .pill input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .pill .unit { color: var(--halter-graphite); font-size: 11px; }
+  .pill.lit { background: var(--halter-mint-cream); border-color: transparent; color: var(--halter-green); }
+  .pill.lit input { color: var(--halter-green); font-weight: 600; }
+
+  input[type=range] {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
+    background: var(--halter-mist); border-radius: 999px; outline: 0; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--halter-green); border: 3px solid var(--halter-lime);
+    box-shadow: 0 1px 3px rgba(14,14,14,0.18); cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%; border: 3px solid var(--halter-lime);
+    background: var(--halter-green); box-shadow: 0 1px 3px rgba(14,14,14,0.18); cursor: pointer;
+  }
+  .hint { font-size: 11px; color: var(--halter-graphite); margin-top: 8px; line-height: 1.4; }
+
+  /* ---------- Selects + radios ---------- */
+  .selrow { padding: 8px 0 14px; }
+  .selrow.col-2 { grid-column: 1 / -1; }
+  .selrow > label { display: block; font-size: 14px; font-weight: 500; color: var(--halter-ink); margin-bottom: 9px; }
+  select {
+    width: 100%; height: 40px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm);
+    background: var(--halter-white); padding: 0 12px; font: inherit; font-size: 14px;
+    color: var(--halter-ink); cursor: pointer; outline: none; transition: border-color .15s var(--ease);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236F7B74' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+  }
+  select:focus { border-color: var(--halter-cactus); }
+  .radio-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .rpill input { position: absolute; opacity: 0; pointer-events: none; }
+  .rpill label {
+    display: inline-block; font-size: 13px; padding: 7px 14px; border-radius: 999px;
+    border: 1px solid var(--halter-mist); color: var(--halter-graphite); cursor: pointer;
+    transition: all .15s var(--ease); user-select: none;
+  }
+  .rpill input:checked + label { background: var(--halter-green); border-color: var(--halter-green); color: var(--halter-lime); }
+  .rpill input:focus-visible + label { outline: 2px solid var(--halter-cactus); outline-offset: 2px; }
+
+  /* ---------- Drivers ---------- */
+  .drivers { display: flex; flex-direction: column; gap: 10px; }
+  .driver {
+    border: 1px solid var(--halter-mist); border-radius: var(--radius-md);
+    overflow: hidden; background: var(--halter-white); transition: border-color .2s var(--ease);
+  }
+  .driver.active { border-color: var(--halter-sage); }
+  .dhead { display: flex; align-items: center; gap: 14px; padding: 15px 18px; cursor: pointer; user-select: none; }
+  .driver.active .dhead { background: var(--halter-mint-cream); }
+  .dtog {
+    width: 40px; height: 23px; border-radius: 999px; border: 0; flex: none;
+    background: var(--halter-mist); position: relative; cursor: pointer; transition: background .2s var(--ease);
+  }
+  .dtog::after {
+    content: ""; position: absolute; width: 17px; height: 17px; border-radius: 50%;
+    background: #fff; top: 3px; left: 3px; transition: transform .2s var(--ease);
+    box-shadow: 0 1px 3px rgba(14,14,14,0.25);
+  }
+  .dtog.on { background: var(--halter-green); }
+  .dtog.on::after { transform: translateX(17px); }
+  .dicon {
+    width: 38px; height: 38px; border-radius: var(--radius-sm); flex: none;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--halter-platinum); color: var(--halter-graphite);
+    transition: all .2s var(--ease);
+  }
+  .driver.active .dicon { background: var(--halter-lime); color: var(--halter-green); }
+  .dicon svg { width: 20px; height: 20px; }
+  .dmeta { flex: 1; min-width: 0; }
+  .dmeta h3 { font-size: 15px; font-weight: 600; margin: 0; color: var(--halter-ink); }
+  .dmeta p { font-size: 12px; color: var(--halter-graphite); margin: 2px 0 0; }
+  .dval { font-family: var(--mono); font-size: 15px; font-weight: 600; color: var(--halter-mist); flex: none; text-align: right; min-width: 78px; }
+  .dval.lit { color: var(--halter-green); }
+  .chev { width: 18px; height: 18px; color: var(--halter-graphite); flex: none; transition: transform .2s var(--ease); }
+  .chev.open { transform: rotate(180deg); }
+  .dbody { display: none; padding: 8px 20px 18px; border-top: 1px solid var(--halter-mist); }
+  .dbody.open { display: block; }
+  .driver.active .dbody { border-color: var(--halter-sage); }
+
+  .note {
+    background: var(--halter-platinum); border: 1px solid var(--halter-mist);
+    border-radius: var(--radius-sm); padding: 11px 13px; font-size: 12px;
+    color: var(--halter-cactus); line-height: 1.5; margin-top: 14px;
+  }
+
+  /* ---------- Results panel ---------- */
+  .results {
+    position: sticky; top: 96px;
+    background: var(--halter-green); color: #fff;
+    border-radius: var(--radius-lg); padding: 30px 32px; overflow: hidden;
+  }
+  .res-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--halter-lime); }
+  .res-big {
+    font-size: clamp(46px, 7vw, 68px); line-height: 0.96; letter-spacing: -0.03em;
+    font-weight: 500; margin: 10px 0 4px; font-variant-numeric: tabular-nums;
+  }
+  .res-sub { font-size: 13px; color: rgba(255,255,255,0.6); }
+  .res-divider { height: 1px; background: rgba(255,255,255,0.14); margin: 24px 0; }
+
+  .ledger { display: flex; flex-direction: column; gap: 2px; }
+  .lrow { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 7px 0; }
+  .lrow .lname { font-size: 14px; color: rgba(255,255,255,0.82); }
+  .lrow .lname small { display: block; font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 1px; }
+  .lrow .lamt { font-family: var(--mono); font-size: 15px; font-weight: 500; color: #fff; font-variant-numeric: tabular-nums; }
+  .lrow.net { border-top: 1px solid rgba(255,255,255,0.18); margin-top: 6px; padding-top: 13px; }
+  .lrow.net .lname { font-weight: 600; color: #fff; }
+  .lrow.net .lamt { font-size: 19px; font-weight: 600; color: var(--halter-lime); }
+
+  .res-foot { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 22px; }
+  .stat { background: rgba(255,255,255,0.06); border-radius: var(--radius-sm); padding: 13px 14px; }
+  .stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.55); }
+  .stat .v { font-family: var(--mono); font-size: 17px; font-weight: 600; margin-top: 5px; font-variant-numeric: tabular-nums; }
+
+  .breakdown-label { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--halter-lime); margin: 26px 0 10px; }
+  .breakdown { display: flex; flex-direction: column; }
+  .brow { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .brow:last-child { border-bottom: 0; }
+  .bname { font-size: 13px; color: rgba(255,255,255,0.78); }
+  .bamt { font-family: var(--mono); font-size: 13px; font-weight: 500; color: #fff; font-variant-numeric: tabular-nums; }
+  .bamt.off { color: rgba(255,255,255,0.32); font-family: var(--font-sans); font-style: italic; }
+
+  footer { text-align: center; padding: 32px var(--gutter) 48px; font-size: 12px; color: var(--halter-graphite); line-height: 1.7; }
+  footer .sep { color: var(--halter-mist); margin: 0 8px; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 940px) {
+    .layout { grid-template-columns: 1fr; }
+    .results { position: static; }
+  }
+  @media (max-width: 560px) {
+    .fields { grid-template-columns: 1fr; }
+    .res-foot { grid-template-columns: 1fr; }
+    .hero { padding-top: 40px; }
+  }
+</style>
+<style>
+  @supports (padding: max(0px)) {
+    .topbar { padding-left: max(var(--gutter), env(safe-area-inset-left)); padding-right: max(var(--gutter), env(safe-area-inset-right)); }
+    footer  { padding-bottom: calc(48px + env(safe-area-inset-bottom)); }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="wordmark">Halter<i></i></span>
+  <span class="topbar-tag">ROI calculator</span>
+</header>
+
+<section class="hero-photo">
+  <img src="assets/hero-cattle-collar.jpg" alt="A mob grazing tall summer pasture, the lead cow wearing a Halter collar">
+  <div class="hero-overlay">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Return on investment</div>
+      <h1>What Halter could be worth on your farm.</h1>
+      <p>Toggle the value drivers on or off to build the right picture for each farm — every number is yours to adjust.</p>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="layout">
+
+    <!-- ============ INPUTS ============ -->
+    <div class="panel">
+
+      <!-- Section 1 — Farm -->
+      <div class="sec">
+        <div class="sec-head">
+          <span class="sec-num">1</span>
+          <h2>Your farm</h2>
+          <span class="sec-rule"></span>
+        </div>
+        <div class="fields">
+          <div class="field">
+            <div class="field-top"><label for="cows">Milking cows</label>
+              <span class="pill"><input type="number" id="cows" value="600" min="50" max="3000" step="10"><span class="unit">cows</span></span></div>
+            <input type="range" class="rng" data-for="cows" min="50" max="3000" step="10" value="600">
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="ha">Effective area</label>
+              <span class="pill"><input type="number" id="ha" value="200" min="10" max="2000" step="5"><span class="unit">ha</span></span></div>
+            <input type="range" class="rng" data-for="ha" min="10" max="2000" step="5" value="200">
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="milkprice">Milk price</label>
+              <span class="pill"><input type="number" id="milkprice" value="9.00" min="4" max="15" step="0.25"><span class="unit">$/kgMS</span></span></div>
+            <input type="range" class="rng" data-for="milkprice" min="4" max="15" step="0.25" value="9.00">
+          </div>
+          <div class="field">
+            <div class="field-top"><label for="dm_current">DM harvested</label>
+              <span class="pill"><input type="number" id="dm_current" value="13500" min="5000" max="25000" step="100"><span class="unit">kgDM/ha</span></span></div>
+            <input type="range" class="rng" data-for="dm_current" min="5000" max="25000" step="100" value="13500">
+            <div class="hint">Current pasture harvested. Used by the pasture utilisation and quality drivers.</div>
+          </div>
+          <div class="field col-2">
+            <div class="field-top"><label for="collar">Halter cost</label>
+              <span class="pill lit"><input type="number" id="collar" value="8" min="2" max="20" step="0.5"><span class="unit">$/cow/month</span></span></div>
+            <input type="range" class="rng" data-for="collar" min="2" max="20" step="0.5" value="8">
+            <div class="hint">Per-cow monthly subscription — edit to match the farm's quote. Annual investment = cows × this × 12.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2 — Value drivers -->
+      <div class="sec">
+        <div class="sec-head">
+          <span class="sec-num">2</span>
+          <h2>Value drivers</h2>
+          <span class="sec-rule"></span>
+        </div>
+        <div class="drivers">
+
+          <!-- Pasture utilisation -->
+          <div class="driver active" data-driver="pasture">
+            <div class="dhead">
+              <button class="dtog on" data-tog="pasture" aria-label="Toggle pasture utilisation"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg></span>
+              <div class="dmeta"><h3>Pasture utilisation</h3><p>Extra pasture harvested with Halter</p></div>
+              <div class="dval lit" data-dv="pasture">—</div>
+              <svg class="chev open" data-chev="pasture" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody open" data-body="pasture">
+              <div class="fields">
+                <div class="field">
+                  <div class="field-top"><label for="extra_pasture">Additional pasture harvested</label>
+                    <span class="pill"><input type="number" id="extra_pasture" value="450" min="0" max="2000" step="10"><span class="unit">kgDM/ha</span></span></div>
+                  <input type="range" class="rng" data-for="extra_pasture" min="0" max="2000" step="10" value="450">
+                  <div class="hint" data-pasture-pct></div>
+                </div>
+                <div class="selrow">
+                  <label for="pasture_use">Farmer would use extra pasture for</label>
+                  <select id="pasture_use">
+                    <option value="supplement">Reduce imported supplement</option>
+                    <option value="kgms" selected>Additional kgMS</option>
+                    <option value="stocking">Increased stocking rate</option>
+                    <option value="profit">Direct profit (DairyNZ $350/tDM)</option>
+                  </select>
+                </div>
+                <div class="selrow">
+                  <label>Feed conversion efficiency (kgDM per kgMS)</label>
+                  <div class="radio-row">
+                    <span class="rpill"><input type="radio" name="fce" id="fce12" value="12"><label for="fce12">12 — high</label></span>
+                    <span class="rpill"><input type="radio" name="fce" id="fce13" value="13" checked><label for="fce13">13 — avg</label></span>
+                    <span class="rpill"><input type="radio" name="fce" id="fce14" value="14"><label for="fce14">14 — low</label></span>
+                  </div>
+                </div>
+                <div class="field" id="supp-cost-field">
+                  <div class="field-top"><label for="supp_cost">Supplement cost</label>
+                    <span class="pill"><input type="number" id="supp_cost" value="450" min="200" max="1000" step="10"><span class="unit">$/tDM</span></span></div>
+                  <input type="range" class="rng" data-for="supp_cost" min="200" max="1000" step="10" value="450">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pasture quality -->
+          <div class="driver" data-driver="quality">
+            <div class="dhead">
+              <button class="dtog" data-tog="quality" aria-label="Toggle pasture quality"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg></span>
+              <div class="dmeta"><h3>Pasture quality (MJME)</h3><p>Value from higher-energy pasture through consistent residuals</p></div>
+              <div class="dval" data-dv="quality">—</div>
+              <svg class="chev" data-chev="quality" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="quality">
+              <div class="fields">
+                <div class="field">
+                  <div class="field-top"><label for="mjme_gain">MJME improvement</label>
+                    <span class="pill"><input type="number" id="mjme_gain" value="0.2" min="0.05" max="1" step="0.05"><span class="unit">per kgDM</span></span></div>
+                  <input type="range" class="rng" data-for="mjme_gain" min="0.05" max="1" step="0.05" value="0.2">
+                </div>
+                <div class="field">
+                  <div class="field-top"><label for="mjme_current">Current avg MJME</label>
+                    <span class="pill"><input type="number" id="mjme_current" value="11.5" min="9" max="14" step="0.1"><span class="unit">MJME</span></span></div>
+                  <input type="range" class="rng" data-for="mjme_current" min="9" max="14" step="0.1" value="11.5">
+                </div>
+                <div class="selrow col-2">
+                  <label for="quality_use">Value this improvement as</label>
+                  <select id="quality_use">
+                    <option value="pasture" selected>Additional pasture grown</option>
+                    <option value="milk">Increased milk production</option>
+                  </select>
+                </div>
+              </div>
+              <div class="note">Total extra MJME = DM harvested × ha × MJME gain. Pasture option divides by current MJME then values via FCE + milk price. Milk option divides by 80 MJME per kgMS.</div>
+            </div>
+          </div>
+
+          <!-- Reproduction -->
+          <div class="driver active" data-driver="repro">
+            <div class="dhead">
+              <button class="dtog on" data-tog="repro" aria-label="Toggle reproduction"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></span>
+              <div class="dmeta"><h3>Reproduction</h3><p>6WICR, NICR and AI performance gains</p></div>
+              <div class="dval lit" data-dv="repro">—</div>
+              <svg class="chev open" data-chev="repro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody open" data-body="repro">
+              <div class="fields">
+                <div class="field">
+                  <div class="field-top"><label for="sixwicr">6-week in-calf rate lift</label>
+                    <span class="pill"><input type="number" id="sixwicr" value="3" min="0" max="15" step="0.5"><span class="unit">%</span></span></div>
+                  <input type="range" class="rng" data-for="sixwicr" min="0" max="15" step="0.5" value="3">
+                </div>
+                <div class="field">
+                  <div class="field-top"><label for="nicr">Not-in-calf rate reduction</label>
+                    <span class="pill"><input type="number" id="nicr" value="2" min="0" max="10" step="0.5"><span class="unit">%</span></span></div>
+                  <input type="range" class="rng" data-for="nicr" min="0" max="10" step="0.5" value="2">
+                </div>
+                <div class="selrow col-2">
+                  <label for="sgl_enable">Full AI + short gestation semen</label>
+                  <select id="sgl_enable"><option value="no" selected>No</option><option value="yes">Yes</option></select>
+                </div>
+                <div class="field" data-sgl style="display:none">
+                  <div class="field-top"><label for="sgl_pct">Herd mated with SGL semen</label>
+                    <span class="pill"><input type="number" id="sgl_pct" value="15" min="5" max="40" step="1"><span class="unit">%</span></span></div>
+                  <input type="range" class="rng" data-for="sgl_pct" min="5" max="40" step="1" value="15">
+                </div>
+                <div class="field" data-sgl style="display:none">
+                  <div class="field-top"><label for="bull_save">Bull cost saving</label>
+                    <span class="pill"><input type="number" id="bull_save" value="10000" min="0" max="80000" step="500"><span class="unit">$</span></span></div>
+                  <input type="range" class="rng" data-for="bull_save" min="0" max="80000" step="500" value="10000">
+                </div>
+              </div>
+              <div class="note">Every 1% gain in 6WICR = $4/cow · every 1% drop in NICR = $10/cow (DairyNZ InCalf Calculator).</div>
+            </div>
+          </div>
+
+          <!-- Lameness -->
+          <div class="driver" data-driver="lameness">
+            <div class="dhead">
+              <button class="dtog" data-tog="lameness" aria-label="Toggle lameness"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2 6 4-14 2 8h6"/></svg></span>
+              <div class="dmeta"><h3>Lameness reduction</h3><p>Cost of lame cows avoided with Halter</p></div>
+              <div class="dval" data-dv="lameness">—</div>
+              <svg class="chev" data-chev="lameness" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="lameness">
+              <div class="fields">
+                <div class="field">
+                  <div class="field-top"><label for="lameness_pct">Current lameness incidence</label>
+                    <span class="pill"><input type="number" id="lameness_pct" value="15" min="1" max="50" step="1"><span class="unit">%</span></span></div>
+                  <input type="range" class="rng" data-for="lameness_pct" min="1" max="50" step="1" value="15">
+                </div>
+                <div class="field">
+                  <div class="field-top"><label for="lameness_reduction">Expected reduction</label>
+                    <span class="pill"><input type="number" id="lameness_reduction" value="40" min="10" max="70" step="1"><span class="unit">%</span></span></div>
+                  <input type="range" class="rng" data-for="lameness_reduction" min="10" max="70" step="1" value="40">
+                </div>
+                <div class="selrow col-2">
+                  <label>Cost per lame cow</label>
+                  <div class="radio-row">
+                    <span class="rpill"><input type="radio" name="lamecost" id="lc300" value="300"><label for="lc300">$300 — conservative</label></span>
+                    <span class="rpill"><input type="radio" name="lamecost" id="lc450" value="450" checked><label for="lc450">$450 — average</label></span>
+                    <span class="rpill"><input type="radio" name="lamecost" id="lc750" value="750"><label for="lc750">$750 — high</label></span>
+                  </div>
+                </div>
+              </div>
+              <div class="note">Halter typically reduces lameness 30–50%. Only apply if the root cause is staff management or long walks — not laneway condition.</div>
+            </div>
+          </div>
+
+          <!-- Labour -->
+          <div class="driver" data-driver="labour">
+            <div class="dhead">
+              <button class="dtog" data-tog="labour" aria-label="Toggle labour"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+              <div class="dmeta"><h3>Labour savings</h3><p>Time saved across daily farm tasks</p></div>
+              <div class="dval" data-dv="labour">—</div>
+              <svg class="chev" data-chev="labour" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="labour">
+              <div class="fields">
+                <div class="field">
+                  <div class="field-top"><label for="hours_week">Hours saved per week</label>
+                    <span class="pill"><input type="number" id="hours_week" value="10" min="0" max="60" step="1"><span class="unit">hrs</span></span></div>
+                  <input type="range" class="rng" data-for="hours_week" min="0" max="60" step="1" value="10">
+                </div>
+                <div class="field">
+                  <div class="field-top"><label for="labour_rate">Labour rate</label>
+                    <span class="pill"><input type="number" id="labour_rate" value="32" min="20" max="60" step="1"><span class="unit">$/hr</span></span></div>
+                  <input type="range" class="rng" data-for="labour_rate" min="20" max="60" step="1" value="32">
+                </div>
+                <div class="field col-2">
+                  <div class="field-top"><label for="weeks">Weeks per season</label>
+                    <span class="pill"><input type="number" id="weeks" value="40" min="20" max="52" step="1"><span class="unit">weeks</span></span></div>
+                  <input type="range" class="rng" data-for="weeks" min="20" max="52" step="1" value="40">
+                </div>
+              </div>
+              <div class="note">Halter typically saves 5–15 hrs/week. Focus on labour redistribution rather than headcount reduction — especially on farms under 1,200 cows.</div>
+            </div>
+          </div>
+
+          <!-- Winter crop -->
+          <div class="driver" data-driver="winter">
+            <div class="dhead">
+              <button class="dtog" data-tog="winter" aria-label="Toggle winter crop"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m2 12 10 0 10 0"/><path d="M12 2v20"/><path d="m4.93 4.93 14.14 14.14"/><path d="m19.07 4.93-14.14 14.14"/></svg></span>
+              <div class="dmeta"><h3>Winter crop</h3><p>Improved utilisation of kale and fodder crops</p></div>
+              <div class="dval" data-dv="winter">—</div>
+              <svg class="chev" data-chev="winter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="winter">
+              <div class="fields">
+                <div class="field">
+                  <div class="field-top"><label for="winter_days">Days on winter crop</label>
+                    <span class="pill"><input type="number" id="winter_days" value="70" min="10" max="150" step="1"><span class="unit">days</span></span></div>
+                  <input type="range" class="rng" data-for="winter_days" min="10" max="150" step="1" value="70">
+                </div>
+                <div class="field">
+                  <div class="field-top"><label for="winter_feed">Feed offered</label>
+                    <span class="pill"><input type="number" id="winter_feed" value="10" min="5" max="20" step="0.5"><span class="unit">kgDM/cow/day</span></span></div>
+                  <input type="range" class="rng" data-for="winter_feed" min="5" max="20" step="0.5" value="10">
+                </div>
+                <div class="field">
+                  <div class="field-top"><label for="winter_util">Utilisation improvement</label>
+                    <span class="pill"><input type="number" id="winter_util" value="10" min="2" max="25" step="1"><span class="unit">%</span></span></div>
+                  <input type="range" class="rng" data-for="winter_util" min="2" max="25" step="1" value="10">
+                </div>
+                <div class="selrow">
+                  <label for="winter_type">Measure saving as</label>
+                  <select id="winter_type">
+                    <option value="grow">Less crop to grow ($0.20/kgDM)</option>
+                    <option value="buy" selected>Less crop to buy ($0.35/kgDM)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ RESULTS ============ -->
+    <aside class="results" id="results">
+      <div class="res-eyebrow">Estimated annual value</div>
+      <div class="res-big" id="grand-total">$0</div>
+      <div class="res-sub" id="gross-sub">Gross value across active drivers</div>
+
+      <div class="res-divider"></div>
+
+      <div class="ledger">
+        <div class="lrow">
+          <span class="lname">Gross annual value</span>
+          <span class="lamt" id="led-gross">$0</span>
+        </div>
+        <div class="lrow">
+          <span class="lname">Halter investment<small id="led-cost-sub">— cows × $8/mo × 12</small></span>
+          <span class="lamt" id="led-cost">$0</span>
+        </div>
+        <div class="lrow net">
+          <span class="lname">Net annual value</span>
+          <span class="lamt" id="led-net">$0</span>
+        </div>
+      </div>
+
+      <div class="res-foot">
+        <div class="stat"><div class="k">Per cow</div><div class="v" id="stat-cow">$0</div></div>
+        <div class="stat"><div class="k">Per ha</div><div class="v" id="stat-ha">$0</div></div>
+        <div class="stat"><div class="k">Return</div><div class="v" id="stat-roi">—</div></div>
+      </div>
+
+      <div class="breakdown-label">Where the value comes from</div>
+      <div class="breakdown" id="breakdown"></div>
+    </aside>
+
+  </div>
+</div>
+
+<footer>
+  Halter dairy ROI calculator <span class="sep">·</span> For account manager use <span class="sep">·</span> Figures are estimates based on farm inputs and published DairyNZ benchmarks
+</footer>
+
+<script>
+  const DRIVERS = ['pasture','quality','repro','lameness','labour','winter'];
+  const LABELS = {
+    pasture: 'Pasture utilisation', quality: 'Pasture quality', repro: 'Reproduction',
+    lameness: 'Lameness', labour: 'Labour', winter: 'Winter crop'
+  };
+  const state = { pasture:true, quality:false, repro:true, lameness:false, labour:false, winter:false };
+
+  const fmt = n => '$' + Math.round(n).toLocaleString('en-NZ');
+  const fmtBig = n => {
+    const a = Math.round(n);
+    if (Math.abs(a) >= 1000000) return '$' + (a/1000000).toFixed(a % 1000000 === 0 ? 0 : 2).replace(/\.?0+$/,'') + 'M';
+    return '$' + a.toLocaleString('en-NZ');
+  };
+  const v = id => parseFloat(document.getElementById(id).value) || 0;
+  const getFCE = () => parseFloat(document.querySelector('input[name="fce"]:checked').value);
+  const getLameCost = () => parseFloat(document.querySelector('input[name="lamecost"]:checked').value);
+
+  /* --- Slider <-> number sync --- */
+  document.querySelectorAll('input.rng').forEach(rng => {
+    const target = document.getElementById(rng.dataset.for);
+    rng.addEventListener('input', () => { target.value = rng.value; calculate(); });
+    target.addEventListener('input', () => { rng.value = target.value; calculate(); });
+  });
+
+  /* --- Driver toggle (on/off) --- */
+  document.querySelectorAll('[data-tog]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const name = btn.dataset.tog;
+      state[name] = !state[name];
+      const card = document.querySelector('[data-driver="'+name+'"]');
+      card.classList.toggle('active', state[name]);
+      btn.classList.toggle('on', state[name]);
+      // expand on turn-on, collapse on turn-off
+      setOpen(name, state[name]);
+      calculate();
+    });
+  });
+
+  /* --- Driver expand/collapse (click header, not toggle) --- */
+  document.querySelectorAll('.dhead').forEach(head => {
+    head.addEventListener('click', e => {
+      if (e.target.closest('[data-tog]')) return;
+      const name = head.closest('[data-driver]').dataset.driver;
+      const body = document.querySelector('[data-body="'+name+'"]');
+      setOpen(name, !body.classList.contains('open'));
+    });
+  });
+  function setOpen(name, open) {
+    document.querySelector('[data-body="'+name+'"]').classList.toggle('open', open);
+    document.querySelector('[data-chev="'+name+'"]').classList.toggle('open', open);
+  }
+
+  /* --- SGL semen sub-fields --- */
+  document.getElementById('sgl_enable').addEventListener('change', e => {
+    document.querySelectorAll('[data-sgl]').forEach(el => el.style.display = e.target.value === 'yes' ? '' : 'none');
+    calculate();
+  });
+
+  document.querySelectorAll('select, input[type=radio]').forEach(el => el.addEventListener('change', calculate));
+
+  /* --- Driver math (unchanged from source) --- */
+  function calcPasture() {
+    if (!state.pasture) return 0;
+    const ha = v('ha'), extra = v('extra_pasture'), mp = v('milkprice'), total = extra * ha;
+    const use = document.getElementById('pasture_use').value;
+    if (use === 'supplement') return total / 1000 * v('supp_cost');
+    if (use === 'kgms')       return (total / getFCE()) * mp;
+    if (use === 'stocking')   return (total / 4500) * 450 * mp;
+    if (use === 'profit')     return extra * 350 * ha / 1000;
+    return 0;
+  }
+  function calcQuality() {
+    if (!state.quality) return 0;
+    const ha = v('ha'), mp = v('milkprice');
+    const totalMJME = v('dm_current') * ha * v('mjme_gain');
+    const use = document.getElementById('quality_use').value;
+    if (use === 'pasture') return (totalMJME / v('mjme_current') / getFCE()) * mp;
+    if (use === 'milk')    return (totalMJME / 80) * mp;
+    return 0;
+  }
+  function calcRepro() {
+    if (!state.repro) return 0;
+    const cows = v('cows'), mp = v('milkprice');
+    let val = v('sixwicr') * 4 * cows + v('nicr') * 10 * cows;
+    if (document.getElementById('sgl_enable').value === 'yes')
+      val += cows * (v('sgl_pct') / 100) * 10 * 1.5 * mp + v('bull_save');
+    return val;
+  }
+  function calcLameness() {
+    if (!state.lameness) return 0;
+    return v('cows') * (v('lameness_pct') / 100) * (v('lameness_reduction') / 100) * getLameCost();
+  }
+  function calcLabour() {
+    if (!state.labour) return 0;
+    return v('hours_week') * v('weeks') * v('labour_rate');
+  }
+  function calcWinter() {
+    if (!state.winter) return 0;
+    const extra = v('cows') * v('winter_days') * v('winter_feed') * (v('winter_util') / 100);
+    return extra * (document.getElementById('winter_type').value === 'grow' ? 0.20 : 0.35);
+  }
+
+  function calculate() {
+    const vals = {
+      pasture: calcPasture(), quality: calcQuality(), repro: calcRepro(),
+      lameness: calcLameness(), labour: calcLabour(), winter: calcWinter()
+    };
+
+    // Per-driver readouts
+    DRIVERS.forEach(k => {
+      const el = document.querySelector('[data-dv="'+k+'"]');
+      if (state[k] && vals[k] > 0) { el.textContent = fmt(vals[k]); el.classList.add('lit'); }
+      else { el.textContent = state[k] ? '$0' : '—'; el.classList.remove('lit'); }
+    });
+
+    const gross = DRIVERS.reduce((a, k) => a + vals[k], 0);
+    const cows = v('cows'), ha = v('ha'), collar = v('collar');
+    const cost = cows * collar * 12;
+    const net = gross - cost;
+
+    document.getElementById('grand-total').textContent = fmtBig(net);
+    document.getElementById('gross-sub').textContent = net >= 0
+      ? 'Net value after Halter investment'
+      : 'Net position after Halter investment';
+
+    document.getElementById('led-gross').textContent = fmt(gross);
+    document.getElementById('led-cost').textContent = '–' + fmt(cost);
+    document.getElementById('led-cost-sub').textContent =
+      cows.toLocaleString('en-NZ') + ' cows × $' + collar + '/mo × 12';
+    document.getElementById('led-net').textContent = fmt(net);
+
+    document.getElementById('stat-cow').textContent = fmt(net / (cows || 1));
+    document.getElementById('stat-ha').textContent = fmt(net / (ha || 1));
+    document.getElementById('stat-roi').textContent = cost > 0 ? (gross / cost).toFixed(1) + '×' : '—';
+
+    // Breakdown
+    document.getElementById('breakdown').innerHTML = DRIVERS.map(k =>
+      '<div class="brow"><span class="bname">' + LABELS[k] + '</span>' +
+      '<span class="bamt ' + (state[k] ? '' : 'off') + '">' + (state[k] ? fmt(vals[k]) : 'off') + '</span></div>'
+    ).join('');
+
+    // Pasture-use conditional field
+    document.getElementById('supp-cost-field').style.display =
+      document.getElementById('pasture_use').value === 'supplement' ? '' : 'none';
+
+    // Pasture % note
+    const dm = v('dm_current'), ep = v('extra_pasture');
+    const pn = document.querySelector('[data-pasture-pct]');
+    if (pn) pn.textContent = (dm > 0 && ep > 0)
+      ? ep + ' kgDM/ha extra = ' + ((ep / dm) * 100).toFixed(1) + '% lift on ' + Math.round(dm).toLocaleString('en-NZ') + ' kgDM/ha harvested'
+      : '';
+  }
+
+  calculate();
+</script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
