@@ -18,6 +18,17 @@ Meetings are stored on the device in the browser's `localStorage`, so they
 persist across reloads and work offline, but they live only in the browser (or
 installed app) they were saved in — they are not synced between devices.
 
+## Printing / exporting a meeting
+
+Tap **Print / PDF** (next to Save meeting) to produce a clean, one-page Halter
+report of the current calculation — headline value, results, the value
+breakdown, the farm inputs, and the assumptions behind each active driver. Each
+saved meeting also has its own **Print** button.
+
+This uses the browser's print dialog, so on an iPad you can **AirPrint** it or
+choose **Save to Files** to export a PDF you can email or file. No calculation
+data ever leaves the device.
+
 ## Files
 
 | Path | Purpose |

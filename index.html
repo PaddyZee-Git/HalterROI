@@ -304,6 +304,55 @@
     .sr-net { order: 2; }
     .sr-actions { order: 3; margin-left: auto; }
   }
+
+  .btn-print {
+    height: 44px; padding: 0 18px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm);
+    background: var(--halter-white); color: var(--halter-green); font-weight: 600; font-size: 14px;
+    display: inline-flex; align-items: center; gap: 8px; transition: border-color .15s var(--ease), color .15s var(--ease);
+  }
+  .btn-print:hover { border-color: var(--halter-cactus); }
+  .btn-print svg { width: 16px; height: 16px; }
+
+  /* ---------- Print report ---------- */
+  #print-report { display: none; }
+  .pr-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 2px solid var(--halter-green); margin-bottom: 18px; }
+  .pr-wordmark { display: inline-flex; align-items: baseline; gap: 2px; font-weight: 600; font-size: 24px; letter-spacing: -0.03em; color: var(--halter-green); }
+  .pr-wordmark i { width: 7px; height: 7px; border-radius: 50%; background: var(--halter-mantis); display: inline-block; align-self: flex-start; margin-top: 5px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pr-tag { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; color: var(--halter-graphite); }
+  .pr-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--halter-cactus); font-weight: 600; }
+  .pr-title h1 { font-size: 26px; font-weight: 600; color: var(--halter-ink); margin: 3px 0; letter-spacing: -0.02em; }
+  .pr-date { font-size: 12px; color: var(--halter-graphite); }
+  .pr-hero { background: var(--halter-green); color: #fff; border-radius: 12px; padding: 18px 22px; margin: 18px 0 22px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pr-hero-k { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--halter-lime); font-weight: 600; }
+  .pr-hero-v { font-size: 40px; font-weight: 600; letter-spacing: -.02em; margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
+  .pr-hero-sub { font-size: 12px; color: rgba(255,255,255,.72); }
+  .pr-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+  .pr-col h2 { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--halter-ink); margin: 0 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--halter-mist); }
+  .pr-col h2 + h2, .pr-breakdown + h2, .pr-kv + h2, .pr-assump + h2 { margin-top: 20px; }
+  .pr-col h2:not(:first-child) { margin-top: 20px; }
+  .pr-row, .pr-kvrow, .pr-brow { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; font-size: 13px; }
+  .pr-row span, .pr-kvrow span, .pr-brow span { color: var(--halter-graphite); }
+  .pr-row b, .pr-kvrow b, .pr-brow b { color: var(--halter-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .pr-net { border-top: 1px solid var(--halter-mist); margin-top: 4px; padding-top: 10px; }
+  .pr-net b { color: var(--halter-green); font-size: 15px; }
+  .pr-off { color: var(--halter-graphite) !important; font-weight: 400 !important; font-style: italic; }
+  .pr-stats { display: flex; gap: 10px; margin: 12px 0 4px; }
+  .pr-stats div { flex: 1; background: var(--halter-platinum); border-radius: 8px; padding: 9px 11px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pr-stats span { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--halter-graphite); }
+  .pr-stats b { font-size: 15px; color: var(--halter-ink); font-variant-numeric: tabular-nums; }
+  .pr-arow { padding: 7px 0; font-size: 12px; border-bottom: 1px solid var(--halter-mist); }
+  .pr-arow:last-child { border-bottom: 0; }
+  .pr-aname { font-weight: 600; color: var(--halter-ink); }
+  .pr-adesc { color: var(--halter-graphite); margin-top: 1px; line-height: 1.4; }
+  .pr-foot { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--halter-mist); font-size: 11px; color: var(--halter-graphite); text-align: center; }
+
+  @media print {
+    @page { margin: 14mm; }
+    html, body { background: #fff !important; }
+    body > *:not(#print-report) { display: none !important; }
+    #print-report { display: block !important; }
+    #toast { display: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -338,6 +387,10 @@
         <button type="button" id="save-meeting" class="btn-save">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
           Save meeting
+        </button>
+        <button type="button" id="print-meeting" class="btn-print">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+          Print / PDF
         </button>
       </div>
 
@@ -655,6 +708,8 @@
   </div>
 </div>
 
+<div id="print-report"></div>
+
 <footer>
   Halter dairy ROI calculator <span class="sep">·</span> For account manager use <span class="sep">·</span> Figures are estimates based on farm inputs and published DairyNZ benchmarks
 </footer>
@@ -929,6 +984,7 @@
         '<div class="sr-main"><div class="sr-name"></div><div class="sr-meta"></div></div>' +
         '<div class="sr-net"></div>' +
         '<div class="sr-actions"><button class="sr-load" type="button">Load</button>' +
+        '<button class="sr-print" type="button">Print</button>' +
         '<button class="sr-del" type="button">Delete</button></div>';
       row.querySelector('.sr-name').textContent = rec.name;
       row.querySelector('.sr-meta').textContent = fmtWhen(rec.savedAt);
@@ -938,6 +994,11 @@
         document.getElementById('meeting_name').value = rec.name;
         window.scrollTo({ top: 0, behavior: 'smooth' });
         flash('Loaded “' + rec.name + '”');
+      });
+      row.querySelector('.sr-print').addEventListener('click', () => {
+        applyState(rec.data);
+        document.getElementById('meeting_name').value = rec.name;
+        printReport(rec.savedAt);
       });
       row.querySelector('.sr-del').addEventListener('click', () => {
         if (confirm('Delete “' + rec.name + '”?')) {
@@ -949,7 +1010,119 @@
     });
   }
 
+  function pv(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+  function selText(id) { const el = document.getElementById(id); return (el && el.selectedIndex >= 0) ? el.options[el.selectedIndex].text : ''; }
+  function driverAssumption(k) {
+    const fce = (document.querySelector('input[name=fce]:checked') || {}).value;
+    const lame = (document.querySelector('input[name=lamecost]:checked') || {}).value;
+    if (k === 'pasture') {
+      let s = pv('extra_pasture') + ' kgDM/ha additional · used for “' + selText('pasture_use') + '” · FCE ' + fce;
+      if (document.getElementById('pasture_use').value === 'supplement') s += ' · supplement $' + pv('supp_cost') + '/tDM';
+      return s;
+    }
+    if (k === 'quality') return 'MJME +' + pv('mjme_gain') + '/kgDM on ' + pv('mjme_current') + ' avg · valued as “' + selText('quality_use') + '”';
+    if (k === 'repro') {
+      let s = '6WICR +' + pv('sixwicr') + '% · NICR −' + pv('nicr') + '%';
+      if (document.getElementById('sgl_enable').value === 'yes') s += ' · SGL ' + pv('sgl_pct') + '% + bull saving $' + pv('bull_save');
+      return s;
+    }
+    if (k === 'lameness') return pv('lameness_pct') + '% incidence · ' + pv('lameness_reduction') + '% reduction · $' + lame + '/lame cow';
+    if (k === 'labour') return pv('hours_week') + ' hrs/wk × ' + pv('weeks') + ' wks × $' + pv('labour_rate') + '/hr';
+    if (k === 'winter') return pv('winter_days') + ' days × ' + pv('winter_feed') + ' kgDM/cow/day · +' + pv('winter_util') + '% util · “' + selText('winter_type') + '”';
+    return '';
+  }
+
+  function buildReport(whenIso) {
+    const rep = document.getElementById('print-report');
+    const name = (document.getElementById('meeting_name').value || '').trim() || 'Untitled meeting';
+    const when = fmtWhen(whenIso || new Date().toISOString());
+    const get = id => document.getElementById(id).textContent;
+    rep.innerHTML =
+      '<div class="pr-head"><span class="pr-wordmark">Halter<i></i></span><span class="pr-tag">ROI calculator</span></div>' +
+      '<div class="pr-title"><div class="pr-eyebrow">Meeting</div><h1 class="pr-name"></h1><div class="pr-date"></div></div>' +
+      '<div class="pr-hero"><div class="pr-hero-k">Estimated annual value</div><div class="pr-hero-v" data-net></div><div class="pr-hero-sub" data-sub></div></div>' +
+      '<div class="pr-cols">' +
+        '<div class="pr-col">' +
+          '<h2>Results</h2>' +
+          '<div class="pr-row"><span>Gross annual value</span><b data-gross></b></div>' +
+          '<div class="pr-row"><span>Halter investment</span><b data-cost></b></div>' +
+          '<div class="pr-row pr-net"><span>Net annual value</span><b data-net2></b></div>' +
+          '<div class="pr-stats"><div><span>Per cow</span><b data-cow></b></div><div><span>Per ha</span><b data-ha></b></div><div><span>Return</span><b data-roi></b></div></div>' +
+          '<h2>Where the value comes from</h2><div class="pr-breakdown" data-breakdown></div>' +
+        '</div>' +
+        '<div class="pr-col">' +
+          '<h2>Farm inputs</h2><div class="pr-kv" data-kv></div>' +
+          '<h2>Driver assumptions</h2><div class="pr-assump" data-assump></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pr-foot">Halter dairy ROI calculator · For account manager use · Figures are estimates based on farm inputs and published DairyNZ benchmarks</div>';
+
+    rep.querySelector('.pr-name').textContent = name;
+    rep.querySelector('.pr-date').textContent = when;
+    rep.querySelector('[data-net]').textContent = get('grand-total');
+    rep.querySelector('[data-sub]').textContent = get('gross-sub');
+    rep.querySelector('[data-gross]').textContent = get('led-gross');
+    rep.querySelector('[data-cost]').textContent = get('led-cost');
+    rep.querySelector('[data-net2]').textContent = get('led-net');
+    rep.querySelector('[data-cow]').textContent = get('stat-cow');
+    rep.querySelector('[data-ha]').textContent = get('stat-ha');
+    rep.querySelector('[data-roi]').textContent = get('stat-roi');
+
+    const bd = rep.querySelector('[data-breakdown]');
+    DRIVERS.forEach(k => {
+      const row = document.createElement('div');
+      row.className = 'pr-brow';
+      row.innerHTML = '<span></span><b></b>';
+      row.querySelector('span').textContent = LABELS[k];
+      const b = row.querySelector('b');
+      if (state[k]) b.textContent = document.querySelector('[data-dv="' + k + '"]').textContent;
+      else { b.textContent = 'Not included'; b.className = 'pr-off'; }
+      bd.appendChild(row);
+    });
+
+    const kv = rep.querySelector('[data-kv]');
+    [
+      ['Milking cows', pv('cows') + ' cows'],
+      ['Effective area', pv('ha') + ' ha'],
+      ['Milk price', '$' + pv('milkprice') + ' /kgMS'],
+      ['DM harvested', pv('dm_current') + ' kgDM/ha'],
+      ['Halter cost', '$' + pv('collar') + ' /cow/month']
+    ].forEach(pair => {
+      const r = document.createElement('div');
+      r.className = 'pr-kvrow';
+      r.innerHTML = '<span></span><b></b>';
+      r.querySelector('span').textContent = pair[0];
+      r.querySelector('b').textContent = pair[1];
+      kv.appendChild(r);
+    });
+
+    const as = rep.querySelector('[data-assump]');
+    const active = DRIVERS.filter(k => state[k]);
+    if (!active.length) {
+      const r = document.createElement('div');
+      r.className = 'pr-arow';
+      r.textContent = 'No value drivers selected.';
+      as.appendChild(r);
+    }
+    active.forEach(k => {
+      const r = document.createElement('div');
+      r.className = 'pr-arow';
+      const n = document.createElement('div');
+      n.className = 'pr-aname';
+      n.textContent = LABELS[k];
+      const d = document.createElement('div');
+      d.className = 'pr-adesc';
+      d.textContent = driverAssumption(k);
+      r.appendChild(n);
+      r.appendChild(d);
+      as.appendChild(r);
+    });
+  }
+
+  function printReport(whenIso) { buildReport(whenIso); window.print(); }
+
   document.getElementById('save-meeting').addEventListener('click', saveMeeting);
+  document.getElementById('print-meeting').addEventListener('click', () => printReport());
   document.getElementById('meeting_name').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); saveMeeting(); }
   });
