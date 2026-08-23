@@ -7,6 +7,19 @@ to host anywhere and to install on an iPad as a full-screen home-screen app.
 The calculator itself (layout, copy, inputs, value drivers, and the underlying
 maths) is reproduced exactly from the source Halter design.
 
+## Deployment cost
+
+A "Deployment cost" section (after the value drivers) estimates the one-off cost
+of deploying Halter, as three switchable components:
+
+- **Towers** — number of towers × $5,700 per tower
+- **Freight** — fixed $1,500 per deployment
+- **Internet / connectivity** — number of properties × $1,440/year ($120/month)
+
+These sum to a **Total deployment cost** shown in the results. Deployment is a
+one-off setup cost, so it is reported separately and does **not** reduce the
+annual net value (which stays a clean per-year figure).
+
 ## Saving meetings
 
 Enter a **Meeting name** at the top of the inputs panel and tap **Save meeting**

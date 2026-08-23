@@ -313,6 +313,8 @@
   .btn-print:hover { border-color: var(--halter-cactus); }
   .btn-print svg { width: 16px; height: 16px; }
 
+  .breakdown-label .one-off { color: rgba(255,255,255,0.5); font-weight: 500; }
+
   /* ---------- Print report ---------- */
   #print-report { display: none; }
   .pr-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 2px solid var(--halter-green); margin-bottom: 18px; }
@@ -661,6 +663,70 @@
 
         </div>
       </div>
+
+      <div class="sec">
+        <div class="sec-head">
+          <span class="sec-num">3</span>
+          <h2>Deployment cost</h2>
+          <span class="sec-rule"></span>
+        </div>
+        <div class="drivers">
+
+          <div class="driver active" data-driver="towers">
+            <div class="dhead">
+              <button class="dtog on" data-tog="towers" aria-label="Toggle towers"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9"/><path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5"/><circle cx="12" cy="9" r="2"/><path d="M16.2 4.8c2 2 2.26 5.11.8 7.47"/><path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1"/><path d="M9.5 18h5"/><path d="m8 22 4-11 4 11"/></svg></span>
+              <div class="dmeta"><h3>Towers</h3><p>On-property tower hardware</p></div>
+              <div class="dval lit" data-dv="towers">—</div>
+              <svg class="chev open" data-chev="towers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody open" data-body="towers">
+              <div class="fields">
+                <div class="field col-2">
+                  <div class="field-top"><label for="towers_count">Number of towers</label>
+                    <span class="pill lit"><input type="number" id="towers_count" value="1" min="0" max="50" step="1"><span class="unit">towers</span></span></div>
+                  <input type="range" class="rng" data-for="towers_count" min="0" max="50" step="1" value="1">
+                  <div class="hint" data-towers-hint></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="driver active" data-driver="freight">
+            <div class="dhead">
+              <button class="dtog on" data-tog="freight" aria-label="Toggle freight"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span>
+              <div class="dmeta"><h3>Freight</h3><p>Fixed freight &amp; logistics</p></div>
+              <div class="dval lit" data-dv="freight">—</div>
+              <svg class="chev open" data-chev="freight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody open" data-body="freight">
+              <div class="note">Fixed one-off freight cost of $1,500 per deployment.</div>
+            </div>
+          </div>
+
+          <div class="driver active" data-driver="connectivity">
+            <div class="dhead">
+              <button class="dtog on" data-tog="connectivity" aria-label="Toggle connectivity"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.86a10 10 0 0 1 14 0"/><path d="M8.5 16.43a5 5 0 0 1 7 0"/></svg></span>
+              <div class="dmeta"><h3>Internet / connectivity</h3><p>Annual connectivity per property</p></div>
+              <div class="dval lit" data-dv="connectivity">—</div>
+              <svg class="chev open" data-chev="connectivity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody open" data-body="connectivity">
+              <div class="fields">
+                <div class="field col-2">
+                  <div class="field-top"><label for="props_count">Number of properties</label>
+                    <span class="pill lit"><input type="number" id="props_count" value="1" min="1" max="20" step="1"><span class="unit">properties</span></span></div>
+                  <input type="range" class="rng" data-for="props_count" min="1" max="20" step="1" value="1">
+                  <div class="hint" data-connect-hint></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
 
     <!-- ============ RESULTS ============ -->
@@ -694,6 +760,15 @@
 
       <div class="breakdown-label">Where the value comes from</div>
       <div class="breakdown" id="breakdown"></div>
+
+      <div class="breakdown-label">Deployment cost <span class="one-off">· one-off setup</span></div>
+      <div class="breakdown" id="deploy-breakdown"></div>
+      <div class="ledger">
+        <div class="lrow net">
+          <span class="lname">Total deployment cost</span>
+          <span class="lamt" id="deploy-total">$0</span>
+        </div>
+      </div>
     </aside>
 
   </div>
@@ -867,6 +942,8 @@
     if (pn) pn.textContent = (dm > 0 && ep > 0)
       ? ep + ' kgDM/ha extra = ' + ((ep / dm) * 100).toFixed(1) + '% lift on ' + Math.round(dm).toLocaleString('en-NZ') + ' kgDM/ha harvested'
       : '';
+
+    if (typeof updateDeployment === 'function') updateDeployment();
   }
 
   calculate();
@@ -874,6 +951,37 @@
 
 <script>
   const LS_KEY = 'halter-roi-sessions';
+
+  state.towers = true; state.freight = true; state.connectivity = true;
+  const DEPLOY = ['towers', 'freight', 'connectivity'];
+  const DEPLOY_LABELS = { towers: 'Towers', freight: 'Freight', connectivity: 'Internet / connectivity' };
+  const TOWER_COST = 5700, FREIGHT_COST = 1500, CONNECT_COST = 1440;
+
+  function calcTowers() { return state.towers ? v('towers_count') * TOWER_COST : 0; }
+  function calcFreight() { return state.freight ? FREIGHT_COST : 0; }
+  function calcConnectivity() { return state.connectivity ? v('props_count') * CONNECT_COST : 0; }
+
+  function updateDeployment() {
+    const vals = { towers: calcTowers(), freight: calcFreight(), connectivity: calcConnectivity() };
+    DEPLOY.forEach(k => {
+      const el = document.querySelector('[data-dv="' + k + '"]');
+      if (!el) return;
+      if (state[k]) { el.textContent = fmt(vals[k]); el.classList.add('lit'); }
+      else { el.textContent = '—'; el.classList.remove('lit'); }
+    });
+    const total = DEPLOY.reduce((a, k) => a + vals[k], 0);
+    const dt = document.getElementById('deploy-total');
+    if (dt) dt.textContent = fmt(total);
+    const bd = document.getElementById('deploy-breakdown');
+    if (bd) bd.innerHTML = DEPLOY.map(k =>
+      '<div class="brow"><span class="bname">' + DEPLOY_LABELS[k] + '</span>' +
+      '<span class="bamt ' + (state[k] ? '' : 'off') + '">' + (state[k] ? fmt(vals[k]) : 'off') + '</span></div>'
+    ).join('');
+    const th = document.querySelector('[data-towers-hint]');
+    if (th) th.textContent = v('towers_count') + ' × $' + TOWER_COST.toLocaleString('en-NZ') + ' per tower = ' + fmt(calcTowers());
+    const ch = document.querySelector('[data-connect-hint]');
+    if (ch) ch.textContent = v('props_count') + ' × $' + CONNECT_COST.toLocaleString('en-NZ') + '/year ($120/month) per property = ' + fmt(calcConnectivity());
+  }
 
   function collectState() {
     const numbers = {};
@@ -913,7 +1021,7 @@
       if (s.radios.lamecost) { const r = document.getElementById('lc' + s.radios.lamecost); if (r) r.checked = true; }
     }
     if (s.drivers) {
-      DRIVERS.forEach(k => {
+      DRIVERS.concat(DEPLOY).forEach(k => {
         const on = !!s.drivers[k];
         state[k] = on;
         const card = document.querySelector('[data-driver="' + k + '"]');
@@ -1049,6 +1157,9 @@
           '<div class="pr-row pr-net"><span>Net annual value</span><b data-net2></b></div>' +
           '<div class="pr-stats"><div><span>Per cow</span><b data-cow></b></div><div><span>Per ha</span><b data-ha></b></div><div><span>Return</span><b data-roi></b></div></div>' +
           '<h2>Where the value comes from</h2><div class="pr-breakdown" data-breakdown></div>' +
+          '<h2>Deployment cost (one-off)</h2><div class="pr-breakdown" data-deploy></div>' +
+          '<div class="pr-row pr-net"><span>Total deployment cost</span><b data-deploytotal></b></div>' +
+          '<div class="pr-adesc" data-deploynote style="padding-top:6px"></div>' +
         '</div>' +
         '<div class="pr-col">' +
           '<h2>Farm inputs</h2><div class="pr-kv" data-kv></div>' +
@@ -1079,6 +1190,24 @@
       else { b.textContent = 'Not included'; b.className = 'pr-off'; }
       bd.appendChild(row);
     });
+
+    const dp = rep.querySelector('[data-deploy]');
+    DEPLOY.forEach(k => {
+      const row = document.createElement('div');
+      row.className = 'pr-brow';
+      row.innerHTML = '<span></span><b></b>';
+      row.querySelector('span').textContent = DEPLOY_LABELS[k];
+      const b = row.querySelector('b');
+      if (state[k]) b.textContent = document.querySelector('[data-dv="' + k + '"]').textContent;
+      else { b.textContent = 'Not included'; b.className = 'pr-off'; }
+      dp.appendChild(row);
+    });
+    rep.querySelector('[data-deploytotal]').textContent = document.getElementById('deploy-total').textContent;
+    const dnote = [];
+    if (state.towers) dnote.push(pv('towers_count') + ' × tower @ $' + TOWER_COST.toLocaleString('en-NZ'));
+    if (state.freight) dnote.push('freight $' + FREIGHT_COST.toLocaleString('en-NZ'));
+    if (state.connectivity) dnote.push(pv('props_count') + ' × property @ $' + CONNECT_COST.toLocaleString('en-NZ') + '/yr');
+    rep.querySelector('[data-deploynote]').textContent = dnote.join(' · ');
 
     const kv = rep.querySelector('[data-kv]');
     [
@@ -1127,6 +1256,7 @@
     if (e.key === 'Enter') { e.preventDefault(); saveMeeting(); }
   });
   renderSaved();
+  updateDeployment();
 </script>
 
 <script>
