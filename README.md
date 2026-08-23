@@ -7,6 +7,17 @@ to host anywhere and to install on an iPad as a full-screen home-screen app.
 The calculator itself (layout, copy, inputs, value drivers, and the underlying
 maths) is reproduced exactly from the source Halter design.
 
+## Saving meetings
+
+Enter a **Meeting name** at the top of the inputs panel and tap **Save meeting**
+to store the whole calculation — every input, driver toggle, and result — under
+that title. Saved meetings appear in the **Saved meetings** list at the bottom,
+where each can be **loaded** back (restoring all inputs) or **deleted**.
+
+Meetings are stored on the device in the browser's `localStorage`, so they
+persist across reloads and work offline, but they live only in the browser (or
+installed app) they were saved in — they are not synced between devices.
+
 ## Files
 
 | Path | Purpose |

@@ -253,6 +253,57 @@
     .topbar { padding-left: max(var(--gutter), env(safe-area-inset-left)); padding-right: max(var(--gutter), env(safe-area-inset-right)); }
     footer  { padding-bottom: calc(48px + env(safe-area-inset-bottom)); }
   }
+
+  /* ---------- Meeting name + save ---------- */
+  .meeting-bar { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; padding-bottom: 22px; margin-bottom: 26px; border-bottom: 1px solid var(--halter-mist); }
+  .meeting-bar .mb-field { flex: 1; min-width: 220px; }
+  .meeting-bar label { display: block; font-size: 14px; font-weight: 500; color: var(--halter-ink); margin-bottom: 9px; }
+  #meeting_name {
+    width: 100%; height: 44px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm);
+    background: var(--halter-white); padding: 0 14px; font: inherit; font-size: 16px; color: var(--halter-ink);
+    outline: none; transition: border-color .15s var(--ease);
+  }
+  #meeting_name:focus { border-color: var(--halter-cactus); }
+  .btn-save {
+    height: 44px; padding: 0 20px; border: 0; border-radius: var(--radius-sm);
+    background: var(--halter-green); color: var(--halter-lime); font-weight: 600; font-size: 14px;
+    display: inline-flex; align-items: center; gap: 8px; transition: background .15s var(--ease);
+  }
+  .btn-save:hover { background: #20402f; }
+  .btn-save svg { width: 16px; height: 16px; }
+
+  /* ---------- Saved meetings ---------- */
+  .saved-panel { margin: 0 0 80px; }
+  .saved-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .saved-head h2 { font-size: 14px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--halter-ink); margin: 0; }
+  .saved-empty {
+    font-size: 13px; color: var(--halter-graphite); background: var(--halter-white);
+    border: 1px dashed var(--halter-mist); border-radius: var(--radius-md); padding: 22px; text-align: center; line-height: 1.5;
+  }
+  #saved-list { display: flex; flex-direction: column; gap: 10px; }
+  .saved-row { display: flex; align-items: center; gap: 16px; background: var(--halter-white); border: 1px solid var(--halter-mist); border-radius: var(--radius-md); padding: 14px 18px; }
+  .sr-main { flex: 1; min-width: 0; }
+  .sr-name { font-size: 15px; font-weight: 600; color: var(--halter-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sr-meta { font-size: 12px; color: var(--halter-graphite); margin-top: 2px; }
+  .sr-net { font-family: var(--mono); font-size: 15px; font-weight: 600; color: var(--halter-green); flex: none; font-variant-numeric: tabular-nums; }
+  .sr-actions { display: flex; gap: 8px; flex: none; }
+  .sr-actions button { height: 34px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 500; border: 1px solid var(--halter-mist); background: var(--halter-white); color: var(--halter-graphite); transition: all .15s var(--ease); }
+  .sr-load { background: var(--halter-green); border-color: var(--halter-green); color: var(--halter-lime); }
+  .sr-del:hover { border-color: var(--halter-danger); color: var(--halter-danger); }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
+    background: var(--halter-ink); color: #fff; padding: 12px 20px; border-radius: 999px;
+    font-size: 14px; font-weight: 500; box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none;
+    transition: opacity .25s var(--ease), transform .25s var(--ease); z-index: 50; max-width: 90vw;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 560px) {
+    .saved-row { flex-wrap: wrap; }
+    .sr-net { order: 2; }
+    .sr-actions { order: 3; margin-left: auto; }
+  }
 </style>
 </head>
 <body>
@@ -278,6 +329,17 @@
 
     <!-- ============ INPUTS ============ -->
     <div class="panel">
+
+      <div class="meeting-bar">
+        <div class="mb-field">
+          <label for="meeting_name">Meeting name</label>
+          <input type="text" id="meeting_name" placeholder="e.g. Smith Farm — Waikato, Aug 2026" autocomplete="off">
+        </div>
+        <button type="button" id="save-meeting" class="btn-save">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
+          Save meeting
+        </button>
+      </div>
 
       <!-- Section 1 — Farm -->
       <div class="sec">
@@ -582,6 +644,15 @@
     </aside>
 
   </div>
+
+  <div class="saved-panel">
+    <div class="saved-head">
+      <h2>Saved meetings</h2>
+      <span class="sec-rule"></span>
+    </div>
+    <div id="saved-empty" class="saved-empty">No saved meetings yet. Enter a meeting name above and tap “Save meeting” to keep this calculation on this device.</div>
+    <div id="saved-list"></div>
+  </div>
 </div>
 
 <footer>
@@ -744,6 +815,145 @@
   }
 
   calculate();
+</script>
+
+<script>
+  const LS_KEY = 'halter-roi-sessions';
+
+  function collectState() {
+    const numbers = {};
+    document.querySelectorAll('input[type=number]').forEach(el => { numbers[el.id] = el.value; });
+    const selects = {};
+    document.querySelectorAll('select').forEach(el => { selects[el.id] = el.value; });
+    const radios = {
+      fce: (document.querySelector('input[name=fce]:checked') || {}).value,
+      lamecost: (document.querySelector('input[name=lamecost]:checked') || {}).value
+    };
+    const results = {
+      net: document.getElementById('grand-total').textContent,
+      gross: document.getElementById('led-gross').textContent,
+      cost: document.getElementById('led-cost').textContent,
+      perCow: document.getElementById('stat-cow').textContent,
+      perHa: document.getElementById('stat-ha').textContent,
+      roi: document.getElementById('stat-roi').textContent
+    };
+    return { numbers, selects, radios, drivers: Object.assign({}, state), results };
+  }
+
+  function applyState(s) {
+    if (!s) return;
+    Object.keys(s.numbers || {}).forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = s.numbers[id];
+      const rng = document.querySelector('input.rng[data-for="' + id + '"]');
+      if (rng) rng.value = s.numbers[id];
+    });
+    Object.keys(s.selects || {}).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = s.selects[id];
+    });
+    if (s.radios) {
+      if (s.radios.fce) { const r = document.getElementById('fce' + s.radios.fce); if (r) r.checked = true; }
+      if (s.radios.lamecost) { const r = document.getElementById('lc' + s.radios.lamecost); if (r) r.checked = true; }
+    }
+    if (s.drivers) {
+      DRIVERS.forEach(k => {
+        const on = !!s.drivers[k];
+        state[k] = on;
+        const card = document.querySelector('[data-driver="' + k + '"]');
+        const btn = document.querySelector('[data-tog="' + k + '"]');
+        if (card) card.classList.toggle('active', on);
+        if (btn) btn.classList.toggle('on', on);
+        setOpen(k, on);
+      });
+    }
+    const sglOn = document.getElementById('sgl_enable').value === 'yes';
+    document.querySelectorAll('[data-sgl]').forEach(el => el.style.display = sglOn ? '' : 'none');
+    calculate();
+  }
+
+  function loadSessions() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch (e) { return []; }
+  }
+  function persist(list) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch (e) {
+      flash('Could not save — device storage is full or blocked.');
+    }
+  }
+
+  let flashTimer;
+  function flash(msg) {
+    let t = document.getElementById('toast');
+    if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  function fmtWhen(iso) {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' }) +
+      ' · ' + d.toLocaleTimeString('en-NZ', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function saveMeeting() {
+    const nameEl = document.getElementById('meeting_name');
+    const name = (nameEl.value || '').trim() || 'Untitled meeting';
+    const now = new Date();
+    const rec = {
+      id: 'm_' + now.getTime() + '_' + Math.random().toString(36).slice(2, 7),
+      name: name,
+      savedAt: now.toISOString(),
+      data: collectState()
+    };
+    const list = loadSessions();
+    list.unshift(rec);
+    persist(list);
+    renderSaved();
+    flash('Saved “' + name + '”');
+  }
+
+  function renderSaved() {
+    const list = loadSessions();
+    const wrap = document.getElementById('saved-list');
+    const empty = document.getElementById('saved-empty');
+    wrap.innerHTML = '';
+    empty.style.display = list.length ? 'none' : 'block';
+    list.forEach(rec => {
+      const row = document.createElement('div');
+      row.className = 'saved-row';
+      row.innerHTML =
+        '<div class="sr-main"><div class="sr-name"></div><div class="sr-meta"></div></div>' +
+        '<div class="sr-net"></div>' +
+        '<div class="sr-actions"><button class="sr-load" type="button">Load</button>' +
+        '<button class="sr-del" type="button">Delete</button></div>';
+      row.querySelector('.sr-name').textContent = rec.name;
+      row.querySelector('.sr-meta').textContent = fmtWhen(rec.savedAt);
+      row.querySelector('.sr-net').textContent = (rec.data && rec.data.results && rec.data.results.net) || '';
+      row.querySelector('.sr-load').addEventListener('click', () => {
+        applyState(rec.data);
+        document.getElementById('meeting_name').value = rec.name;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        flash('Loaded “' + rec.name + '”');
+      });
+      row.querySelector('.sr-del').addEventListener('click', () => {
+        if (confirm('Delete “' + rec.name + '”?')) {
+          persist(loadSessions().filter(x => x.id !== rec.id));
+          renderSaved();
+        }
+      });
+      wrap.appendChild(row);
+    });
+  }
+
+  document.getElementById('save-meeting').addEventListener('click', saveMeeting);
+  document.getElementById('meeting_name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); saveMeeting(); }
+  });
+  renderSaved();
 </script>
 
 <script>
