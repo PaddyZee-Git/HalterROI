@@ -425,11 +425,27 @@
             <input type="range" class="rng" data-for="dm_current" min="5000" max="25000" step="100" value="13500">
             <div class="hint">Current pasture harvested. Used by the pasture utilisation and quality drivers.</div>
           </div>
+          <div class="selrow col-2">
+            <label>Halter package</label>
+            <div class="radio-row">
+              <span class="rpill"><input type="radio" name="pkg" id="pkg_core" value="core" checked><label for="pkg_core">Core</label></span>
+              <span class="rpill"><input type="radio" name="pkg" id="pkg_pro" value="pro"><label for="pkg_pro">Pro</label></span>
+              <span class="rpill"><input type="radio" name="pkg" id="pkg_unlimited" value="unlimited"><label for="pkg_unlimited">Unlimited</label></span>
+            </div>
+          </div>
+          <div class="selrow col-2">
+            <label>Billing term</label>
+            <div class="radio-row">
+              <span class="rpill"><input type="radio" name="term" id="term_monthly" value="monthly" checked><label for="term_monthly">Monthly</label></span>
+              <span class="rpill"><input type="radio" name="term" id="term_12" value="upfront12"><label for="term_12">12 months upfront</label></span>
+              <span class="rpill"><input type="radio" name="term" id="term_24" value="upfront24"><label for="term_24">24 months upfront</label></span>
+            </div>
+          </div>
           <div class="field col-2">
             <div class="field-top"><label for="collar">Halter cost</label>
-              <span class="pill lit"><input type="number" id="collar" value="8" min="2" max="20" step="0.5"><span class="unit">$/cow/month</span></span></div>
-            <input type="range" class="rng" data-for="collar" min="2" max="20" step="0.5" value="8">
-            <div class="hint">Per-cow monthly subscription — edit to match the farm's quote. Annual investment = cows × this × 12.</div>
+              <span class="pill lit"><input type="number" id="collar" value="11.40" min="5" max="20" step="0.01"><span class="unit">$/cow/month</span></span></div>
+            <input type="range" class="rng" data-for="collar" min="5" max="20" step="0.01" value="11.40">
+            <div class="hint" data-collar-hint></div>
           </div>
         </div>
       </div>
@@ -944,6 +960,7 @@
       : '';
 
     if (typeof updateDeployment === 'function') updateDeployment();
+    if (typeof updateCollarHint === 'function') updateCollarHint();
   }
 
   calculate();
@@ -983,15 +1000,43 @@
     if (ch) ch.textContent = v('props_count') + ' × $' + CONNECT_COST.toLocaleString('en-NZ') + '/year ($120/month) per property = ' + fmt(calcConnectivity());
   }
 
+  const PRICING = {
+    core:      { monthly: 11.40, upfront12: 9.90,  upfront24: 9.41 },
+    pro:       { monthly: 14.40, upfront12: 12.90, upfront24: 12.26 },
+    unlimited: { monthly: 16.00, upfront12: 14.50, upfront24: 13.78 }
+  };
+  const PKG_LABELS = { core: 'Core', pro: 'Pro', unlimited: 'Unlimited' };
+  const TERM_LABELS = { monthly: 'Monthly', upfront12: '12 months upfront', upfront24: '24 months upfront' };
+  function selectedPkg() { return (document.querySelector('input[name=pkg]:checked') || {}).value || 'core'; }
+  function selectedTerm() { return (document.querySelector('input[name=term]:checked') || {}).value || 'monthly'; }
+
+  function applyPackagePrice() {
+    const price = PRICING[selectedPkg()][selectedTerm()];
+    const collar = document.getElementById('collar');
+    collar.value = price.toFixed(2);
+    const rng = document.querySelector('input.rng[data-for="collar"]');
+    if (rng) rng.value = price;
+    calculate();
+  }
+
+  function updateCollarHint() {
+    const el = document.querySelector('[data-collar-hint]');
+    if (!el) return;
+    const price = PRICING[selectedPkg()][selectedTerm()];
+    const collar = v('collar');
+    let s = PKG_LABELS[selectedPkg()] + ' · ' + TERM_LABELS[selectedTerm()] + ' — $' + collar.toFixed(2) + ' AUD per collar/month, excl. GST';
+    if (Math.abs(collar - price) > 0.001) s += ' · custom price';
+    s += '. Annual investment = ' + v('cows').toLocaleString('en-NZ') + ' × $' + collar.toFixed(2) + ' × 12 = ' + fmt(v('cows') * collar * 12);
+    el.textContent = s;
+  }
+
   function collectState() {
     const numbers = {};
     document.querySelectorAll('input[type=number]').forEach(el => { numbers[el.id] = el.value; });
     const selects = {};
     document.querySelectorAll('select').forEach(el => { selects[el.id] = el.value; });
-    const radios = {
-      fce: (document.querySelector('input[name=fce]:checked') || {}).value,
-      lamecost: (document.querySelector('input[name=lamecost]:checked') || {}).value
-    };
+    const radios = {};
+    document.querySelectorAll('input[type=radio]').forEach(el => { if (el.checked) radios[el.name] = el.value; });
     const results = {
       net: document.getElementById('grand-total').textContent,
       gross: document.getElementById('led-gross').textContent,
@@ -1017,8 +1062,10 @@
       if (el) el.value = s.selects[id];
     });
     if (s.radios) {
-      if (s.radios.fce) { const r = document.getElementById('fce' + s.radios.fce); if (r) r.checked = true; }
-      if (s.radios.lamecost) { const r = document.getElementById('lc' + s.radios.lamecost); if (r) r.checked = true; }
+      Object.keys(s.radios).forEach(name => {
+        const r = document.querySelector('input[name="' + name + '"][value="' + s.radios[name] + '"]');
+        if (r) r.checked = true;
+      });
     }
     if (s.drivers) {
       DRIVERS.concat(DEPLOY).forEach(k => {
@@ -1215,6 +1262,7 @@
       ['Effective area', pv('ha') + ' ha'],
       ['Milk price', '$' + pv('milkprice') + ' /kgMS'],
       ['DM harvested', pv('dm_current') + ' kgDM/ha'],
+      ['Halter package', PKG_LABELS[selectedPkg()] + ' · ' + TERM_LABELS[selectedTerm()]],
       ['Halter cost', '$' + pv('collar') + ' /cow/month']
     ].forEach(pair => {
       const r = document.createElement('div');
@@ -1252,11 +1300,12 @@
 
   document.getElementById('save-meeting').addEventListener('click', saveMeeting);
   document.getElementById('print-meeting').addEventListener('click', () => printReport());
+  document.querySelectorAll('input[name=pkg], input[name=term]').forEach(el => el.addEventListener('change', applyPackagePrice));
   document.getElementById('meeting_name').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); saveMeeting(); }
   });
   renderSaved();
-  updateDeployment();
+  calculate();
 </script>
 
 <script>

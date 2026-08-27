@@ -7,6 +7,21 @@ to host anywhere and to install on an iPad as a full-screen home-screen app.
 The calculator itself (layout, copy, inputs, value drivers, and the underlying
 maths) is reproduced exactly from the source Halter design.
 
+## Halter package pricing
+
+In "Your farm", the Halter cost is driven by a **package** selector (Core / Pro /
+Unlimited) and a **billing term** selector (Monthly / 12 months upfront / 24
+months upfront), using Halter's Australian per-collar/month pricing (excl. GST):
+
+| Package | Monthly | 12 mo upfront | 24 mo upfront |
+| --- | --- | --- | --- |
+| Core | $11.40 | $9.90 | $9.41 |
+| Pro | $14.40 | $12.90 | $12.26 |
+| Unlimited | $16.00 | $14.50 | $13.78 |
+
+Selecting a package/term fills the per-collar price automatically. The price
+field stays editable for a custom quote (flagged as "custom price" in the hint).
+
 ## Deployment cost
 
 A "Deployment cost" section (after the value drivers) estimates the one-off cost
