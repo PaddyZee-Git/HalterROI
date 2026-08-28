@@ -441,6 +441,7 @@
             <div class="field-top"><label for="kgms_cow">Milk solids per cow</label>
               <span class="pill"><input type="number" id="kgms_cow" value="450" min="200" max="800" step="5"><span class="unit">kgMS/cow</span></span></div>
             <input type="range" class="rng" data-for="kgms_cow" min="200" max="800" step="5" value="450">
+            <div class="hint" data-herd></div>
           </div>
           <div class="field">
             <div class="field-top"><label for="ha">Effective area</label>
@@ -1018,6 +1019,7 @@
     if (typeof updateDeployment === 'function') updateDeployment();
     if (typeof updateCollarHint === 'function') updateCollarHint();
     if (typeof updatePastureLink === 'function') updatePastureLink();
+    if (typeof updateHerd === 'function') updateHerd();
   }
 
   calculate();
@@ -1133,6 +1135,14 @@
       btn.setAttribute('aria-expanded', opening ? 'true' : 'false');
     });
   })();
+
+  const fmtShort = n => { const a = Math.round(n); return Math.abs(a) >= 1e6 ? '$' + (a / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M' : '$' + a.toLocaleString('en-NZ'); };
+  function updateHerd() {
+    const el = document.querySelector('[data-herd]');
+    if (!el) return;
+    const ms = Math.round(v('cows') * v('kgms_cow'));
+    el.textContent = 'Herd production ≈ ' + ms.toLocaleString('en-NZ') + ' kgMS/yr · ≈ ' + fmtShort(ms * v('milkprice')) + ' milk revenue';
+  }
 
   let editingLift = false;
   function fromLift() {
@@ -1384,6 +1394,7 @@
     [
       ['Milking cows', pv('cows') + ' cows'],
       ['Milk solids per cow', pv('kgms_cow') + ' kgMS'],
+      ['Herd production', Math.round(v('cows') * v('kgms_cow')).toLocaleString('en-NZ') + ' kgMS/yr · ' + fmtShort(v('cows') * v('kgms_cow') * v('milkprice'))],
       ['Effective area', pv('ha') + ' ha'],
       ['Milk price', '$' + pv('milkprice') + ' /kgMS'],
       ['DM harvested', pv('dm_current') + ' kgDM/ha'],

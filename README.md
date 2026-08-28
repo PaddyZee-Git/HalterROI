@@ -14,6 +14,10 @@ next to Milking cows. It feeds the Pasture utilisation → "Increased stocking
 rate" option (extra cows carried × kgMS/cow × milk price); other options are
 unaffected.
 
+Below the field, a read-only **Herd production** caption shows total milk solids
+(Milking cows × kgMS/cow) and approximate milk revenue (× milk price) — baseline
+farm context that does not affect the ROI. It also prints in the report.
+
 ## Pasture lift (% ↔ kgDM/ha)
 
 In the Pasture utilisation driver, "Additional pasture harvested" (kgDM/ha) is
