@@ -476,6 +476,12 @@
                   <input type="range" class="rng" data-for="extra_pasture" min="0" max="2000" step="10" value="450">
                   <div class="hint" data-pasture-pct></div>
                 </div>
+                <div class="field">
+                  <div class="field-top"><label for="pasture_lift">Pasture lift</label>
+                    <span class="pill"><input type="number" id="pasture_lift" value="3.3" min="0" max="30" step="0.1"><span class="unit">%</span></span></div>
+                  <input type="range" id="pasture_lift_rng" min="0" max="30" step="0.1" value="3.3">
+                  <div class="hint">Set a % lift to auto-fill kgDM/ha — or edit kgDM/ha directly.</div>
+                </div>
                 <div class="selrow">
                   <label for="pasture_use">Farmer would use extra pasture for</label>
                   <select id="pasture_use">
@@ -961,6 +967,7 @@
 
     if (typeof updateDeployment === 'function') updateDeployment();
     if (typeof updateCollarHint === 'function') updateCollarHint();
+    if (typeof updatePastureLink === 'function') updatePastureLink();
   }
 
   calculate();
@@ -1028,6 +1035,26 @@
     if (Math.abs(collar - price) > 0.001) s += ' · custom price';
     s += '. Annual investment = ' + v('cows').toLocaleString('en-NZ') + ' × $' + collar.toFixed(2) + ' × 12 = ' + fmt(v('cows') * collar * 12);
     el.textContent = s;
+  }
+
+  let editingLift = false;
+  function fromLift() {
+    editingLift = true;
+    const extra = Math.round(v('dm_current') * v('pasture_lift') / 100 / 10) * 10;
+    document.getElementById('extra_pasture').value = extra;
+    const exRng = document.querySelector('input.rng[data-for="extra_pasture"]');
+    if (exRng) exRng.value = extra;
+    calculate();
+    editingLift = false;
+  }
+  function updatePastureLink() {
+    if (editingLift) return;
+    const dm = v('dm_current');
+    const pct = dm > 0 ? +(v('extra_pasture') / dm * 100).toFixed(1) : 0;
+    const liftNum = document.getElementById('pasture_lift');
+    const liftRng = document.getElementById('pasture_lift_rng');
+    if (liftNum) liftNum.value = pct;
+    if (liftRng) liftRng.value = pct;
   }
 
   function collectState() {
@@ -1171,7 +1198,7 @@
     const fce = (document.querySelector('input[name=fce]:checked') || {}).value;
     const lame = (document.querySelector('input[name=lamecost]:checked') || {}).value;
     if (k === 'pasture') {
-      let s = pv('extra_pasture') + ' kgDM/ha additional · used for “' + selText('pasture_use') + '” · FCE ' + fce;
+      let s = pv('extra_pasture') + ' kgDM/ha (+' + pv('pasture_lift') + '%) additional · used for “' + selText('pasture_use') + '” · FCE ' + fce;
       if (document.getElementById('pasture_use').value === 'supplement') s += ' · supplement $' + pv('supp_cost') + '/tDM';
       return s;
     }
@@ -1301,6 +1328,8 @@
   document.getElementById('save-meeting').addEventListener('click', saveMeeting);
   document.getElementById('print-meeting').addEventListener('click', () => printReport());
   document.querySelectorAll('input[name=pkg], input[name=term]').forEach(el => el.addEventListener('change', applyPackagePrice));
+  document.getElementById('pasture_lift').addEventListener('input', fromLift);
+  document.getElementById('pasture_lift_rng').addEventListener('input', () => { document.getElementById('pasture_lift').value = document.getElementById('pasture_lift_rng').value; fromLift(); });
   document.getElementById('meeting_name').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); saveMeeting(); }
   });

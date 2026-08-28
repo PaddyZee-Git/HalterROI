@@ -7,6 +7,14 @@ to host anywhere and to install on an iPad as a full-screen home-screen app.
 The calculator itself (layout, copy, inputs, value drivers, and the underlying
 maths) is reproduced exactly from the source Halter design.
 
+## Pasture lift (% ↔ kgDM/ha)
+
+In the Pasture utilisation driver, "Additional pasture harvested" (kgDM/ha) is
+linked to a **Pasture lift (%)** field. Enter a % lift and the kgDM/ha auto-fills
+(% × DM harvested); edit the kgDM/ha and the % updates to match. The kgDM/ha
+figure is what feeds the calculation, so changing "DM harvested" re-derives the
+% from it.
+
 ## Halter package pricing
 
 In "Your farm", the Halter cost is driven by a **package** selector (Core / Pro /
