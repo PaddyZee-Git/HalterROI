@@ -438,6 +438,11 @@
             <input type="range" class="rng" data-for="cows" min="50" max="3000" step="10" value="600">
           </div>
           <div class="field">
+            <div class="field-top"><label for="kgms_cow">Milk solids per cow</label>
+              <span class="pill"><input type="number" id="kgms_cow" value="450" min="200" max="800" step="5"><span class="unit">kgMS/cow</span></span></div>
+            <input type="range" class="rng" data-for="kgms_cow" min="200" max="800" step="5" value="450">
+          </div>
+          <div class="field">
             <div class="field-top"><label for="ha">Effective area</label>
               <span class="pill"><input type="number" id="ha" value="200" min="10" max="2000" step="5"><span class="unit">ha</span></span></div>
             <input type="range" class="rng" data-for="ha" min="10" max="2000" step="5" value="200">
@@ -925,7 +930,7 @@
     const use = document.getElementById('pasture_use').value;
     if (use === 'supplement') return total / 1000 * v('supp_cost');
     if (use === 'kgms')       return (total / getFCE()) * mp;
-    if (use === 'stocking')   return (total / 4500) * 450 * mp;
+    if (use === 'stocking')   return (total / 4500) * v('kgms_cow') * mp;
     if (use === 'profit')     return extra * 350 * ha / 1000;
     return 0;
   }
@@ -1378,6 +1383,7 @@
     const kv = rep.querySelector('[data-kv]');
     [
       ['Milking cows', pv('cows') + ' cows'],
+      ['Milk solids per cow', pv('kgms_cow') + ' kgMS'],
       ['Effective area', pv('ha') + ' ha'],
       ['Milk price', '$' + pv('milkprice') + ' /kgMS'],
       ['DM harvested', pv('dm_current') + ' kgDM/ha'],

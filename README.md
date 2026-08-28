@@ -7,6 +7,13 @@ to host anywhere and to install on an iPad as a full-screen home-screen app.
 The calculator itself (layout, copy, inputs, value drivers, and the underlying
 maths) is reproduced exactly from the source Halter design.
 
+## Milk solids per cow
+
+"Your farm" includes an editable **Milk solids per cow** (kgMS/cow, default 450)
+next to Milking cows. It feeds the Pasture utilisation → "Increased stocking
+rate" option (extra cows carried × kgMS/cow × milk price); other options are
+unaffected.
+
 ## Pasture lift (% ↔ kgDM/ha)
 
 In the Pasture utilisation driver, "Additional pasture harvested" (kgDM/ha) is
