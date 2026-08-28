@@ -820,6 +820,7 @@
   const state = { pasture:true, quality:false, repro:true, lameness:false, labour:false, winter:false };
 
   const fmt = n => '$' + Math.round(n).toLocaleString('en-NZ');
+  const fmtSigned = n => { const a = Math.round(n); const s = a > 0 ? '+' : a < 0 ? '-' : ''; return s + '$' + Math.abs(a).toLocaleString('en-NZ'); };
   const fmtBig = n => {
     const a = Math.round(n);
     const sign = a > 0 ? '+' : a < 0 ? '-' : '';
@@ -944,10 +945,10 @@
     document.getElementById('led-cost').textContent = '–' + fmt(cost);
     document.getElementById('led-cost-sub').textContent =
       cows.toLocaleString('en-NZ') + ' cows × $' + collar + '/mo × 12';
-    document.getElementById('led-net').textContent = fmt(net);
+    document.getElementById('led-net').textContent = fmtSigned(net);
 
-    document.getElementById('stat-cow').textContent = fmt(net / (cows || 1));
-    document.getElementById('stat-ha').textContent = fmt(net / (ha || 1));
+    document.getElementById('stat-cow').textContent = fmtSigned(net / (cows || 1));
+    document.getElementById('stat-ha').textContent = fmtSigned(net / (ha || 1));
     document.getElementById('stat-roi').textContent = cost > 0 ? (gross / cost).toFixed(1) + '×' : '—';
 
     // Breakdown
