@@ -26,12 +26,14 @@ linked to a **Pasture lift (%)** field. Enter a % lift and the kgDM/ha auto-fill
 figure is what feeds the calculation, so changing "DM harvested" re-derives the
 % from it.
 
-## Pasture utilisation working
+## Calculation working ("How this is calculated")
 
-The Pasture utilisation card shows a live "How this is calculated" line at the
-bottom that spells out the formula and numbers for the selected option (reduce
-supplement / additional kgMS / stocking rate / direct profit), so the figure can
-be talked through transparently with the customer.
+Every value driver (pasture utilisation, pasture quality, reproduction,
+lameness, labour, winter crop) shows a live "How this is calculated" line at the
+bottom of its card that spells out the formula and numbers behind its figure, so
+each result can be talked through transparently with the customer. The printed
+report includes the working for every active driver under "How each value is
+calculated".
 
 ## Halter package pricing
 

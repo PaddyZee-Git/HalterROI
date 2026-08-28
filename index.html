@@ -557,7 +557,7 @@
                   <input type="range" class="rng" data-for="supp_cost" min="200" max="1000" step="10" value="450">
                 </div>
               </div>
-              <div class="calc-note" data-pasture-calc></div>
+              <div class="calc-note" data-calc="pasture"></div>
             </div>
           </div>
 
@@ -591,6 +591,7 @@
                 </div>
               </div>
               <div class="note">Total extra MJME = DM harvested × ha × MJME gain. Pasture option divides by current MJME then values via FCE + milk price. Milk option divides by 80 MJME per kgMS.</div>
+              <div class="calc-note" data-calc="quality"></div>
             </div>
           </div>
 
@@ -631,6 +632,7 @@
                 </div>
               </div>
               <div class="note">Every 1% gain in 6WICR = $4/cow · every 1% drop in NICR = $10/cow (DairyNZ InCalf Calculator).</div>
+              <div class="calc-note" data-calc="repro"></div>
             </div>
           </div>
 
@@ -665,6 +667,7 @@
                 </div>
               </div>
               <div class="note">Halter typically reduces lameness 30–50%. Only apply if the root cause is staff management or long walks — not laneway condition.</div>
+              <div class="calc-note" data-calc="lameness"></div>
             </div>
           </div>
 
@@ -696,6 +699,7 @@
                 </div>
               </div>
               <div class="note">Halter typically saves 5–15 hrs/week. Focus on labour redistribution rather than headcount reduction — especially on farms under 1,200 cows.</div>
+              <div class="calc-note" data-calc="labour"></div>
             </div>
           </div>
 
@@ -733,6 +737,7 @@
                   </select>
                 </div>
               </div>
+              <div class="calc-note" data-calc="winter"></div>
             </div>
           </div>
 
@@ -1025,7 +1030,7 @@
     if (typeof updateCollarHint === 'function') updateCollarHint();
     if (typeof updatePastureLink === 'function') updatePastureLink();
     if (typeof updateHerd === 'function') updateHerd();
-    if (typeof updatePastureCalc === 'function') updatePastureCalc();
+    if (typeof updateWorkings === 'function') updateWorkings();
     if (typeof autoSave === 'function') autoSave();
   }
 
@@ -1162,27 +1167,53 @@
     el.textContent = 'Herd production ≈ ' + ms.toLocaleString('en-NZ') + ' kgMS/yr · ≈ ' + fmtShort(ms * v('milkprice')) + ' milk revenue';
   }
 
-  function updatePastureCalc() {
-    const el = document.querySelector('[data-pasture-calc]');
-    if (!el) return;
-    const ha = v('ha'), extra = v('extra_pasture'), mp = v('milkprice'), total = extra * ha;
-    const use = document.getElementById('pasture_use').value;
+  function workingText(k) {
     const nz = n => Math.round(n).toLocaleString('en-NZ');
-    const base = nz(extra) + ' kgDM/ha × ' + nz(ha) + ' ha = ' + nz(total) + ' kgDM';
-    let s = '';
-    if (use === 'supplement') {
-      const sc = v('supp_cost');
-      s = base + ' = ' + nz(total / 1000) + ' tDM × $' + nz(sc) + '/tDM = ' + fmt(total / 1000 * sc);
-    } else if (use === 'kgms') {
-      const fce = getFCE();
-      s = base + ' ÷ ' + fce + ' kgDM/kgMS = ' + nz(total / fce) + ' kgMS × $' + mp.toFixed(2) + '/kgMS = ' + fmt(total / fce * mp);
-    } else if (use === 'stocking') {
-      const kc = v('kgms_cow');
-      s = base + ' ÷ 4,500 kgDM/cow = ' + nz(total / 4500) + ' cows × ' + nz(kc) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(total / 4500 * kc * mp);
-    } else if (use === 'profit') {
-      s = base + ' = ' + nz(total / 1000) + ' tDM × $350/tDM = ' + fmt(extra * 350 * ha / 1000);
+    const ha = v('ha'), cows = v('cows'), mp = v('milkprice');
+    if (k === 'pasture') {
+      const extra = v('extra_pasture'), total = extra * ha, use = document.getElementById('pasture_use').value;
+      const base = nz(extra) + ' kgDM/ha × ' + nz(ha) + ' ha = ' + nz(total) + ' kgDM';
+      if (use === 'supplement') { const sc = v('supp_cost'); return base + ' = ' + nz(total / 1000) + ' tDM × $' + nz(sc) + '/tDM = ' + fmt(total / 1000 * sc); }
+      if (use === 'kgms') { const fce = getFCE(); return base + ' ÷ ' + fce + ' kgDM/kgMS = ' + nz(total / fce) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(total / fce * mp); }
+      if (use === 'stocking') { const kc = v('kgms_cow'); return base + ' ÷ 4,500 kgDM/cow = ' + nz(total / 4500) + ' cows × ' + nz(kc) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(total / 4500 * kc * mp); }
+      return base + ' = ' + nz(total / 1000) + ' tDM × $350/tDM = ' + fmt(extra * 350 * ha / 1000);
     }
-    el.innerHTML = '<strong>How this is calculated</strong><span class="calc-formula">' + s + '</span>';
+    if (k === 'quality') {
+      const totalMJME = v('dm_current') * ha * v('mjme_gain'), use = document.getElementById('quality_use').value;
+      const base = nz(v('dm_current')) + ' kgDM/ha × ' + nz(ha) + ' ha × ' + v('mjme_gain') + ' MJME = ' + nz(totalMJME) + ' MJME';
+      if (use === 'pasture') { const fce = getFCE(); return base + ' ÷ ' + v('mjme_current') + ' MJME/kgDM ÷ ' + fce + ' = ' + nz(totalMJME / v('mjme_current') / fce) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(totalMJME / v('mjme_current') / fce * mp); }
+      return base + ' ÷ 80 MJME/kgMS = ' + nz(totalMJME / 80) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(totalMJME / 80 * mp);
+    }
+    if (k === 'repro') {
+      const a = v('sixwicr') * 4 * cows, b = v('nicr') * 10 * cows;
+      let s = '6WICR: ' + v('sixwicr') + ' × $4 × ' + nz(cows) + ' = ' + fmt(a) + ' · NICR: ' + v('nicr') + ' × $10 × ' + nz(cows) + ' = ' + fmt(b);
+      let tot = a + b;
+      if (document.getElementById('sgl_enable').value === 'yes') {
+        const sgl = cows * (v('sgl_pct') / 100) * 10 * 1.5 * mp, bull = v('bull_save');
+        s += ' · SGL: ' + nz(cows) + ' × ' + v('sgl_pct') + '% × 10 × 1.5 × $' + mp.toFixed(2) + ' = ' + fmt(sgl) + ' + bull ' + fmt(bull);
+        tot += sgl + bull;
+      }
+      return s + ' = ' + fmt(tot);
+    }
+    if (k === 'lameness') {
+      const lc = getLameCost();
+      return nz(cows) + ' cows × ' + v('lameness_pct') + '% × ' + v('lameness_reduction') + '% × $' + nz(lc) + ' = ' + fmt(cows * (v('lameness_pct') / 100) * (v('lameness_reduction') / 100) * lc);
+    }
+    if (k === 'labour') {
+      return v('hours_week') + ' hrs/wk × ' + v('weeks') + ' wks × $' + nz(v('labour_rate')) + '/hr = ' + fmt(v('hours_week') * v('weeks') * v('labour_rate'));
+    }
+    if (k === 'winter') {
+      const extra = cows * v('winter_days') * v('winter_feed') * (v('winter_util') / 100);
+      const rate = document.getElementById('winter_type').value === 'grow' ? 0.20 : 0.35;
+      return nz(cows) + ' cows × ' + v('winter_days') + ' days × ' + v('winter_feed') + ' kgDM × ' + v('winter_util') + '% = ' + nz(extra) + ' kgDM × $' + rate.toFixed(2) + '/kgDM = ' + fmt(extra * rate);
+    }
+    return '';
+  }
+  function updateWorkings() {
+    DRIVERS.forEach(k => {
+      const el = document.querySelector('[data-calc="' + k + '"]');
+      if (el) el.innerHTML = '<strong>How this is calculated</strong><span class="calc-formula">' + workingText(k) + '</span>';
+    });
   }
 
   let editingLift = false;
@@ -1341,27 +1372,6 @@
   }
 
   function pv(id) { const el = document.getElementById(id); return el ? el.value : ''; }
-  function selText(id) { const el = document.getElementById(id); return (el && el.selectedIndex >= 0) ? el.options[el.selectedIndex].text : ''; }
-  function driverAssumption(k) {
-    const fce = (document.querySelector('input[name=fce]:checked') || {}).value;
-    const lame = (document.querySelector('input[name=lamecost]:checked') || {}).value;
-    if (k === 'pasture') {
-      let s = pv('extra_pasture') + ' kgDM/ha (+' + pv('pasture_lift') + '%) additional · used for “' + selText('pasture_use') + '” · FCE ' + fce;
-      if (document.getElementById('pasture_use').value === 'supplement') s += ' · supplement $' + pv('supp_cost') + '/tDM';
-      return s;
-    }
-    if (k === 'quality') return 'MJME +' + pv('mjme_gain') + '/kgDM on ' + pv('mjme_current') + ' avg · valued as “' + selText('quality_use') + '”';
-    if (k === 'repro') {
-      let s = '6WICR +' + pv('sixwicr') + '% · NICR −' + pv('nicr') + '%';
-      if (document.getElementById('sgl_enable').value === 'yes') s += ' · SGL ' + pv('sgl_pct') + '% + bull saving $' + pv('bull_save');
-      return s;
-    }
-    if (k === 'lameness') return pv('lameness_pct') + '% incidence · ' + pv('lameness_reduction') + '% reduction · $' + lame + '/lame cow';
-    if (k === 'labour') return pv('hours_week') + ' hrs/wk × ' + pv('weeks') + ' wks × $' + pv('labour_rate') + '/hr';
-    if (k === 'winter') return pv('winter_days') + ' days × ' + pv('winter_feed') + ' kgDM/cow/day · +' + pv('winter_util') + '% util · “' + selText('winter_type') + '”';
-    return '';
-  }
-
   function buildReport(whenIso) {
     const rep = document.getElementById('print-report');
     const name = (document.getElementById('meeting_name').value || '').trim() || 'Untitled meeting';
@@ -1385,7 +1395,7 @@
         '</div>' +
         '<div class="pr-col">' +
           '<h2>Farm inputs</h2><div class="pr-kv" data-kv></div>' +
-          '<h2>Driver assumptions</h2><div class="pr-assump" data-assump></div>' +
+          '<h2>How each value is calculated</h2><div class="pr-assump" data-assump></div>' +
         '</div>' +
       '</div>' +
       '<div class="pr-foot">Halter dairy ROI calculator · For account manager use · Figures are estimates based on farm inputs and published DairyNZ benchmarks</div>';
@@ -1466,7 +1476,7 @@
       n.textContent = LABELS[k];
       const d = document.createElement('div');
       d.className = 'pr-adesc';
-      d.textContent = driverAssumption(k);
+      d.textContent = workingText(k);
       r.appendChild(n);
       r.appendChild(d);
       as.appendChild(r);
