@@ -753,7 +753,7 @@
 
     <!-- ============ RESULTS ============ -->
     <aside class="results" id="results">
-      <div class="res-eyebrow">Estimated annual value</div>
+      <div class="res-eyebrow">Estimated annual profit</div>
       <div class="res-big" id="grand-total">$0</div>
       <div class="res-sub" id="gross-sub">Gross value across active drivers</div>
 
@@ -822,8 +822,10 @@
   const fmt = n => '$' + Math.round(n).toLocaleString('en-NZ');
   const fmtBig = n => {
     const a = Math.round(n);
-    if (Math.abs(a) >= 1000000) return '$' + (a/1000000).toFixed(a % 1000000 === 0 ? 0 : 2).replace(/\.?0+$/,'') + 'M';
-    return '$' + a.toLocaleString('en-NZ');
+    const sign = a > 0 ? '+' : a < 0 ? '-' : '';
+    const abs = Math.abs(a);
+    if (abs >= 1000000) return sign + '$' + (abs/1000000).toFixed(abs % 1000000 === 0 ? 0 : 2).replace(/\.?0+$/,'') + 'M';
+    return sign + '$' + abs.toLocaleString('en-NZ');
   };
   const v = id => parseFloat(document.getElementById(id).value) || 0;
   const getFCE = () => parseFloat(document.querySelector('input[name="fce"]:checked').value);
@@ -1222,7 +1224,7 @@
     rep.innerHTML =
       '<div class="pr-head"><span class="pr-wordmark">Halter<i></i></span><span class="pr-tag">ROI calculator</span></div>' +
       '<div class="pr-title"><div class="pr-eyebrow">Meeting</div><h1 class="pr-name"></h1><div class="pr-date"></div></div>' +
-      '<div class="pr-hero"><div class="pr-hero-k">Estimated annual value</div><div class="pr-hero-v" data-net></div><div class="pr-hero-sub" data-sub></div></div>' +
+      '<div class="pr-hero"><div class="pr-hero-k">Estimated annual profit</div><div class="pr-hero-v" data-net></div><div class="pr-hero-sub" data-sub></div></div>' +
       '<div class="pr-cols">' +
         '<div class="pr-col">' +
           '<h2>Results</h2>' +
