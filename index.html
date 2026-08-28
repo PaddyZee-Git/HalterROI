@@ -315,6 +315,10 @@
 
   .breakdown-label .one-off { color: rgba(255,255,255,0.5); font-weight: 500; }
 
+  .calc-note { background: var(--halter-platinum); border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); padding: 11px 13px; margin-top: 14px; line-height: 1.5; }
+  .calc-note strong { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--halter-ink); font-weight: 600; margin-bottom: 3px; }
+  .calc-note .calc-formula { font-family: var(--mono); font-size: 12px; color: var(--halter-green); }
+
   /* ---------- Package comparison ---------- */
   .selrow-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
   .selrow-head label { margin-bottom: 0; }
@@ -553,6 +557,7 @@
                   <input type="range" class="rng" data-for="supp_cost" min="200" max="1000" step="10" value="450">
                 </div>
               </div>
+              <div class="calc-note" data-pasture-calc></div>
             </div>
           </div>
 
@@ -1020,6 +1025,7 @@
     if (typeof updateCollarHint === 'function') updateCollarHint();
     if (typeof updatePastureLink === 'function') updatePastureLink();
     if (typeof updateHerd === 'function') updateHerd();
+    if (typeof updatePastureCalc === 'function') updatePastureCalc();
     if (typeof autoSave === 'function') autoSave();
   }
 
@@ -1154,6 +1160,29 @@
     if (!el) return;
     const ms = Math.round(v('cows') * v('kgms_cow'));
     el.textContent = 'Herd production ≈ ' + ms.toLocaleString('en-NZ') + ' kgMS/yr · ≈ ' + fmtShort(ms * v('milkprice')) + ' milk revenue';
+  }
+
+  function updatePastureCalc() {
+    const el = document.querySelector('[data-pasture-calc]');
+    if (!el) return;
+    const ha = v('ha'), extra = v('extra_pasture'), mp = v('milkprice'), total = extra * ha;
+    const use = document.getElementById('pasture_use').value;
+    const nz = n => Math.round(n).toLocaleString('en-NZ');
+    const base = nz(extra) + ' kgDM/ha × ' + nz(ha) + ' ha = ' + nz(total) + ' kgDM';
+    let s = '';
+    if (use === 'supplement') {
+      const sc = v('supp_cost');
+      s = base + ' = ' + nz(total / 1000) + ' tDM × $' + nz(sc) + '/tDM = ' + fmt(total / 1000 * sc);
+    } else if (use === 'kgms') {
+      const fce = getFCE();
+      s = base + ' ÷ ' + fce + ' kgDM/kgMS = ' + nz(total / fce) + ' kgMS × $' + mp.toFixed(2) + '/kgMS = ' + fmt(total / fce * mp);
+    } else if (use === 'stocking') {
+      const kc = v('kgms_cow');
+      s = base + ' ÷ 4,500 kgDM/cow = ' + nz(total / 4500) + ' cows × ' + nz(kc) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(total / 4500 * kc * mp);
+    } else if (use === 'profit') {
+      s = base + ' = ' + nz(total / 1000) + ' tDM × $350/tDM = ' + fmt(extra * 350 * ha / 1000);
+    }
+    el.innerHTML = '<strong>How this is calculated</strong><span class="calc-formula">' + s + '</span>';
   }
 
   let editingLift = false;
