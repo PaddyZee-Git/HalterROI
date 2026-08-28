@@ -556,6 +556,12 @@
                     <span class="pill"><input type="number" id="supp_cost" value="450" min="200" max="1000" step="10"><span class="unit">$/tDM</span></span></div>
                   <input type="range" class="rng" data-for="supp_cost" min="200" max="1000" step="10" value="450">
                 </div>
+                <div class="field" id="stock-dm-field" style="display:none">
+                  <div class="field-top"><label for="dm_per_cow">Feed per extra cow</label>
+                    <span class="pill"><input type="number" id="dm_per_cow" value="5000" min="3000" max="8000" step="100"><span class="unit">kgDM/cow</span></span></div>
+                  <input type="range" class="rng" data-for="dm_per_cow" min="3000" max="8000" step="100" value="5000">
+                  <div class="hint">Annual feed demand per additional cow (≈5,000 kgDM in SW Victoria). Used only for the stocking-rate option.</div>
+                </div>
               </div>
               <div class="calc-note" data-calc="pasture"></div>
             </div>
@@ -941,7 +947,7 @@
     const use = document.getElementById('pasture_use').value;
     if (use === 'supplement') return total / 1000 * v('supp_cost');
     if (use === 'kgms')       return (total / getFCE()) * mp;
-    if (use === 'stocking')   return (total / 4500) * v('kgms_cow') * mp;
+    if (use === 'stocking')   return (total / v('dm_per_cow')) * v('kgms_cow') * mp;
     if (use === 'profit')     return extra * 350 * ha / 1000;
     return 0;
   }
@@ -1018,6 +1024,8 @@
     // Pasture-use conditional field
     document.getElementById('supp-cost-field').style.display =
       document.getElementById('pasture_use').value === 'supplement' ? '' : 'none';
+    document.getElementById('stock-dm-field').style.display =
+      document.getElementById('pasture_use').value === 'stocking' ? '' : 'none';
 
     // Pasture % note
     const dm = v('dm_current'), ep = v('extra_pasture');
@@ -1175,7 +1183,7 @@
       const base = nz(extra) + ' kgDM/ha × ' + nz(ha) + ' ha = ' + nz(total) + ' kgDM';
       if (use === 'supplement') { const sc = v('supp_cost'); return base + ' = ' + nz(total / 1000) + ' tDM × $' + nz(sc) + '/tDM = ' + fmt(total / 1000 * sc); }
       if (use === 'kgms') { const fce = getFCE(); return base + ' ÷ ' + fce + ' kgDM/kgMS = ' + nz(total / fce) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(total / fce * mp); }
-      if (use === 'stocking') { const kc = v('kgms_cow'); return base + ' ÷ 4,500 kgDM/cow = ' + nz(total / 4500) + ' cows × ' + nz(kc) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(total / 4500 * kc * mp); }
+      if (use === 'stocking') { const kc = v('kgms_cow'), dmc = v('dm_per_cow'); return base + ' ÷ ' + nz(dmc) + ' kgDM/cow = ' + nz(total / dmc) + ' cows × ' + nz(kc) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(total / dmc * kc * mp); }
       return base + ' = ' + nz(total / 1000) + ' tDM × $350/tDM = ' + fmt(extra * 350 * ha / 1000);
     }
     if (k === 'quality') {

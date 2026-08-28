@@ -12,7 +12,9 @@ maths) is reproduced exactly from the source Halter design.
 "Your farm" includes an editable **Milk solids per cow** (kgMS/cow, default 450)
 next to Milking cows. It feeds the Pasture utilisation → "Increased stocking
 rate" option (extra cows carried × kgMS/cow × milk price); other options are
-unaffected.
+unaffected. That option also has an editable **Feed per extra cow** field
+(annual kgDM demand per additional cow, default 5,000 kgDM ≈ SW Victoria), shown
+only when the stocking-rate option is selected.
 
 Below the field, a read-only **Herd production** caption shows total milk solids
 (Milking cows × kgMS/cow) and approximate milk revenue (× milk price) — baseline
