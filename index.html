@@ -315,6 +315,34 @@
 
   .breakdown-label .one-off { color: rgba(255,255,255,0.5); font-weight: 500; }
 
+  /* ---------- Package comparison ---------- */
+  .selrow-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+  .selrow-head label { margin-bottom: 0; }
+  .btn-pkg-info {
+    display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px;
+    border: 1px solid var(--halter-mist); border-radius: 999px; background: var(--halter-white);
+    color: var(--halter-green); font-size: 12px; font-weight: 600; transition: border-color .15s var(--ease);
+  }
+  .btn-pkg-info:hover { border-color: var(--halter-cactus); }
+  .btn-pkg-info svg { width: 14px; height: 14px; }
+  .btn-pkg-info .chev-sm { transition: transform .2s var(--ease); }
+  .btn-pkg-info[aria-expanded="true"] .chev-sm { transform: rotate(180deg); }
+
+  .pkg-table-wrap { margin-top: 12px; border: 1px solid var(--halter-mist); border-radius: var(--radius-md); overflow: auto; max-height: 60vh; }
+  .pkg-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .pkg-table th, .pkg-table td { padding: 8px 12px; text-align: center; border-bottom: 1px solid var(--halter-mist); }
+  .pkg-table thead th { position: sticky; top: 0; background: var(--halter-green); color: #fff; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+  .pkg-table thead th:first-child { text-align: left; }
+  .pkg-table tbody th { text-align: left; font-weight: 500; color: var(--halter-ink); }
+  .pkg-table tbody tr:nth-child(even) { background: var(--halter-platinum); }
+  .pkg-table tbody tr:last-child th, .pkg-table tbody tr:last-child td { border-bottom: 0; }
+  .pkg-yes { color: var(--halter-green); font-weight: 700; }
+  .pkg-no { color: var(--halter-mist); }
+  .pkg-lvl { display: inline-block; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; }
+  .pkg-lvl.basic { background: var(--halter-platinum); color: var(--halter-graphite); border: 1px solid var(--halter-mist); }
+  .pkg-lvl.full { background: var(--halter-mint-cream); color: var(--halter-green); }
+  .pkg-table-foot { font-size: 11px; color: var(--halter-graphite); padding: 9px 12px; background: var(--halter-white); }
+
   /* ---------- Print report ---------- */
   #print-report { display: none; }
   .pr-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 2px solid var(--halter-green); margin-bottom: 18px; }
@@ -426,11 +454,25 @@
             <div class="hint">Current pasture harvested. Used by the pasture utilisation and quality drivers.</div>
           </div>
           <div class="selrow col-2">
-            <label>Halter package</label>
+            <div class="selrow-head">
+              <label>Halter package</label>
+              <button type="button" id="pkg-info-btn" class="btn-pkg-info" aria-expanded="false" aria-controls="pkg-table">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+                Packages
+                <svg class="chev-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+            </div>
             <div class="radio-row">
               <span class="rpill"><input type="radio" name="pkg" id="pkg_core" value="core" checked><label for="pkg_core">Core</label></span>
               <span class="rpill"><input type="radio" name="pkg" id="pkg_pro" value="pro"><label for="pkg_pro">Pro</label></span>
               <span class="rpill"><input type="radio" name="pkg" id="pkg_unlimited" value="unlimited"><label for="pkg_unlimited">Unlimited</label></span>
+            </div>
+            <div class="pkg-table-wrap" id="pkg-table" hidden>
+              <table class="pkg-table">
+                <thead><tr><th>Feature</th><th>Core</th><th>Pro</th><th>Unlimited</th></tr></thead>
+                <tbody id="pkg-table-body"></tbody>
+              </table>
+              <div class="pkg-table-foot">Per collar, per month, excl. GST (AUD). For information only — does not affect the calculation.</div>
             </div>
           </div>
           <div class="selrow col-2">
@@ -1039,6 +1081,53 @@
     s += '. Annual investment = ' + v('cows').toLocaleString('en-NZ') + ' × $' + collar.toFixed(2) + ' × 12 = ' + fmt(v('cows') * collar * 12);
     el.textContent = s;
   }
+
+  const PKG_FEATURES = [
+    ['Virtual fencing', 'yes', 'yes', 'yes'],
+    ['MoveMyMob', 'yes', 'yes', 'yes'],
+    ['Block-level pasture map', 'yes', 'yes', 'yes'],
+    ['Riparian / no-go zones', 'yes', 'yes', 'yes'],
+    ['AUTO-APC', 'no', 'yes', 'yes'],
+    ['Pasture trends', 'basic', 'full', 'full'],
+    ['Break allocation by leaf-stage', 'no', 'yes', 'yes'],
+    ['Round-length management', 'no', 'yes', 'yes'],
+    ['Block performance reporting', 'basic', 'full', 'full'],
+    ['Heat detection', 'no', 'yes', 'yes'],
+    ['Pre-mating heat calendar', 'no', 'yes', 'yes'],
+    ['Anoestrus alerts', 'no', 'yes', 'yes'],
+    ['Mating module', 'no', 'yes', 'yes'],
+    ['Health flags', 'no', 'yes', 'yes'],
+    ['Lameness early-warning', 'no', 'yes', 'yes'],
+    ['Calving monitoring', 'no', 'no', 'yes'],
+    ['Mastitis screening', 'no', 'no', 'yes'],
+    ['Heat-stress monitoring', 'no', 'no', 'yes'],
+    ['Treatment / draft lists', 'basic', 'full', 'full'],
+    ['Advanced trend reports', 'no', 'basic', 'full']
+  ];
+  function pkgCell(val) {
+    if (val === 'yes') return '<span class="pkg-yes">✓</span>';
+    if (val === 'no') return '<span class="pkg-no">✕</span>';
+    if (val === 'basic') return '<span class="pkg-lvl basic">Basic</span>';
+    if (val === 'full') return '<span class="pkg-lvl full">Full</span>';
+    return '';
+  }
+  (function renderPkgTable() {
+    const tb = document.getElementById('pkg-table-body');
+    if (!tb) return;
+    tb.innerHTML = PKG_FEATURES.map(r =>
+      '<tr><th scope="row">' + r[0] + '</th><td>' + pkgCell(r[1]) + '</td><td>' + pkgCell(r[2]) + '</td><td>' + pkgCell(r[3]) + '</td></tr>'
+    ).join('');
+  })();
+  (function wirePkgInfo() {
+    const btn = document.getElementById('pkg-info-btn');
+    const wrap = document.getElementById('pkg-table');
+    if (!btn || !wrap) return;
+    btn.addEventListener('click', () => {
+      const opening = wrap.hasAttribute('hidden');
+      if (opening) wrap.removeAttribute('hidden'); else wrap.setAttribute('hidden', '');
+      btn.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    });
+  })();
 
   let editingLift = false;
   function fromLift() {
