@@ -54,6 +54,14 @@ These sum to a **Total deployment cost** shown in the results. Deployment is a
 one-off setup cost, so it is reported separately and does **not** reduce the
 annual net value (which stays a clean per-year figure).
 
+## Auto-resume
+
+The app remembers your current working state on the device and restores it when
+reopened, so you pick up exactly where you left off — every input, package/term,
+driver toggle, deployment setting, and the meeting name. This is separate from
+Saved meetings (named snapshots): it is a single, always-updating "last session"
+stored per device in `localStorage`.
+
 ## Saving meetings
 
 Enter a **Meeting name** at the top of the inputs panel and tap **Save meeting**

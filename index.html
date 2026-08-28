@@ -1020,6 +1020,7 @@
     if (typeof updateCollarHint === 'function') updateCollarHint();
     if (typeof updatePastureLink === 'function') updatePastureLink();
     if (typeof updateHerd === 'function') updateHerd();
+    if (typeof autoSave === 'function') autoSave();
   }
 
   calculate();
@@ -1027,6 +1028,17 @@
 
 <script>
   const LS_KEY = 'halter-roi-sessions';
+  const LS_AUTO = 'halter-roi-autosave';
+  let autoTimer;
+  function autoSave() {
+    clearTimeout(autoTimer);
+    autoTimer = setTimeout(() => {
+      try {
+        const mn = document.getElementById('meeting_name');
+        localStorage.setItem(LS_AUTO, JSON.stringify({ meetingName: mn ? mn.value : '', state: collectState() }));
+      } catch (e) {}
+    }, 300);
+  }
 
   state.towers = true; state.freight = true; state.connectivity = true;
   const DEPLOY = ['towers', 'freight', 'connectivity'];
@@ -1443,6 +1455,15 @@
     if (e.key === 'Enter') { e.preventDefault(); saveMeeting(); }
   });
   renderSaved();
+  try {
+    const raw = localStorage.getItem(LS_AUTO);
+    const payload = raw ? JSON.parse(raw) : null;
+    if (payload && payload.state) {
+      applyState(payload.state);
+      const mn = document.getElementById('meeting_name');
+      if (mn && payload.meetingName) mn.value = payload.meetingName;
+    }
+  } catch (e) {}
   calculate();
 </script>
 
