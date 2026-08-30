@@ -52,6 +52,16 @@ months upfront), using Halter's Australian per-collar/month pricing (excl. GST):
 Selecting a package/term fills the per-collar price automatically. The price
 field stays editable for a custom quote (flagged as "custom price" in the hint).
 
+## Vehicles & maintenance
+
+A value driver estimating the saving from reduced reliance on farm vehicles.
+Add vehicles as line items — type (Quad / 4-wheeler, Farm bike, Side-by-side,
+Other, which pre-fill typical figures), a count, and yearly **Vehicle, Fuel,
+Maintenance and Repairs** costs. The fleet's total yearly cost × an editable
+"Halter reduces vehicle costs by %" gives the annual saving, which feeds the
+profit. The working line shows the fleet cost per year and per month. Vehicles
+persist in saved meetings and auto-resume.
+
 ## Deployment cost
 
 A "Deployment cost" section (after the value drivers) estimates the one-off cost

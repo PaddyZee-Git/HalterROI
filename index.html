@@ -385,6 +385,21 @@
   .pill .unit { font-size: 13px; }
   #meeting_name { height: 52px; font-size: 17px; }
 
+  .veh-list { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+  .veh-row { border: 1px solid var(--halter-mist); border-radius: var(--radius-md); padding: 12px 14px; background: var(--halter-white); }
+  .veh-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .veh-top select { flex: 1; min-width: 150px; }
+  .veh-del { flex: none; width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--halter-mist); background: var(--halter-white); color: var(--halter-graphite); font-size: 20px; line-height: 1; cursor: pointer; }
+  .veh-del:hover { border-color: var(--halter-danger); color: var(--halter-danger); }
+  .veh-costs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-top: 12px; }
+  .veh-cost label { display: block; font-size: 13px; color: var(--halter-graphite); margin-bottom: 6px; }
+  .veh-cost .pill { min-width: 0; width: 100%; }
+  .veh-cost .pill input { width: 100%; }
+  .veh-sub { margin-top: 12px; font-size: 12px; color: var(--halter-graphite); font-variant-numeric: tabular-nums; }
+  .btn-add-veh { margin-top: 12px; height: 44px; padding: 0 18px; border: 1px dashed var(--halter-mist); border-radius: var(--radius-sm); background: var(--halter-white); color: var(--halter-green); font-weight: 600; font-size: 14px; cursor: pointer; }
+  .btn-add-veh:hover { border-color: var(--halter-cactus); }
+  @media (max-width: 560px) { .veh-costs { grid-template-columns: 1fr; } }
+
   @media print {
     @page { margin: 14mm; }
     html, body { background: #fff !important; }
@@ -752,6 +767,29 @@
             </div>
           </div>
 
+          <div class="driver" data-driver="vehicles">
+            <div class="dhead">
+              <button class="dtog" data-tog="vehicles" aria-label="Toggle vehicles and maintenance"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></span>
+              <div class="dmeta"><h3>Vehicles &amp; maintenance</h3><p>Reduced vehicle running costs with Halter</p></div>
+              <div class="dval" data-dv="vehicles">—</div>
+              <svg class="chev" data-chev="vehicles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="vehicles">
+              <div class="fields">
+                <div class="field col-2">
+                  <div class="field-top"><label for="veh_reduction">Halter reduces vehicle costs by</label>
+                    <span class="pill"><input type="number" id="veh_reduction" value="25" min="0" max="100" step="5"><span class="unit">%</span></span></div>
+                  <input type="range" class="rng" data-for="veh_reduction" min="0" max="100" step="5" value="25">
+                  <div class="hint">Applied to the total yearly fleet cost below to give the annual saving.</div>
+                </div>
+              </div>
+              <div id="veh-list" class="veh-list"></div>
+              <button type="button" id="veh-add" class="btn-add-veh">+ Add vehicle</button>
+              <div class="calc-note" data-calc="vehicles"></div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -881,10 +919,10 @@
 </footer>
 
 <script>
-  const DRIVERS = ['pasture','quality','repro','lameness','labour','winter'];
+  const DRIVERS = ['pasture','quality','repro','lameness','labour','winter','vehicles'];
   const LABELS = {
     pasture: 'Pasture utilisation', quality: 'Pasture quality', repro: 'Reproduction',
-    lameness: 'Lameness', labour: 'Labour', winter: 'Winter crop'
+    lameness: 'Lameness', labour: 'Labour', winter: 'Winter crop', vehicles: 'Vehicles & maintenance'
   };
   const state = { pasture:true, quality:false, repro:true, lameness:false, labour:false, winter:false };
 
@@ -990,7 +1028,8 @@
   function calculate() {
     const vals = {
       pasture: calcPasture(), quality: calcQuality(), repro: calcRepro(),
-      lameness: calcLameness(), labour: calcLabour(), winter: calcWinter()
+      lameness: calcLameness(), labour: calcLabour(), winter: calcWinter(),
+      vehicles: (typeof calcVehicles === 'function' ? calcVehicles() : 0)
     };
 
     // Per-driver readouts
@@ -1220,6 +1259,10 @@
       const rate = document.getElementById('winter_type').value === 'grow' ? 0.20 : 0.35;
       return nz(cows) + ' cows × ' + v('winter_days') + ' days × ' + v('winter_feed') + ' kgDM × ' + v('winter_util') + '% = ' + nz(extra) + ' kgDM × $' + rate.toFixed(2) + '/kgDM = ' + fmt(extra * rate);
     }
+    if (k === 'vehicles') {
+      const total = fleetAnnual(), red = v('veh_reduction');
+      return 'Fleet ' + fmt(total) + '/yr (' + fmt(total / 12) + '/mo) × ' + red + '% reduction = ' + fmt(total * red / 100);
+    }
     return '';
   }
   function updateWorkings() {
@@ -1228,6 +1271,73 @@
       if (el) el.innerHTML = '<strong>How this is calculated</strong><span class="calc-formula">' + workingText(k) + '</span>';
     });
   }
+
+  state.vehicles = false;
+  const VEH_TYPES = [
+    { k: 'quad', name: 'Quad / 4-wheeler', cost: 2000, fuel: 1200, maint: 600, repairs: 500 },
+    { k: 'bike', name: 'Farm bike', cost: 1500, fuel: 900, maint: 450, repairs: 400 },
+    { k: 'sxs', name: 'Side-by-side', cost: 4000, fuel: 1800, maint: 900, repairs: 800 },
+    { k: 'other', name: 'Other', cost: 0, fuel: 0, maint: 0, repairs: 0 }
+  ];
+  let vehicles = [
+    { type: 'quad', count: 2, cost: 2000, fuel: 1200, maint: 600, repairs: 500 },
+    { type: 'sxs', count: 1, cost: 4000, fuel: 1800, maint: 900, repairs: 800 }
+  ];
+  function applyVehPreset(row) { const t = VEH_TYPES.find(x => x.k === row.type) || VEH_TYPES[0]; row.cost = t.cost; row.fuel = t.fuel; row.maint = t.maint; row.repairs = t.repairs; }
+  function fleetAnnual() { return vehicles.reduce((a, r) => a + (Number(r.count) || 0) * ((Number(r.cost) || 0) + (Number(r.fuel) || 0) + (Number(r.maint) || 0) + (Number(r.repairs) || 0)), 0); }
+  function calcVehicles() { if (!state.vehicles) return 0; return fleetAnnual() * (v('veh_reduction') / 100); }
+  function vehCostField(i, f, label, val) {
+    return '<div class="veh-cost"><label>' + label + '</label><span class="pill"><input type="number" class="veh-f" data-i="' + i + '" data-f="' + f + '" value="' + val + '" min="0" max="200000" step="50"><span class="unit">$/yr</span></span></div>';
+  }
+  function updateVehSubs() {
+    vehicles.forEach((r, i) => {
+      const el = document.querySelector('[data-sub="' + i + '"]');
+      if (!el) return;
+      const each = (Number(r.cost) || 0) + (Number(r.fuel) || 0) + (Number(r.maint) || 0) + (Number(r.repairs) || 0);
+      el.textContent = fmt(each) + '/yr each · ' + fmt(each * (Number(r.count) || 0)) + '/yr for ' + (Number(r.count) || 0);
+    });
+  }
+  function renderVehicles() {
+    const list = document.getElementById('veh-list');
+    if (!list) return;
+    list.innerHTML = vehicles.map((r, i) =>
+      '<div class="veh-row">' +
+        '<div class="veh-top">' +
+          '<select class="veh-type" data-i="' + i + '">' + VEH_TYPES.map(t => '<option value="' + t.k + '"' + (r.type === t.k ? ' selected' : '') + '>' + t.name + '</option>').join('') + '</select>' +
+          '<span class="pill"><input type="number" class="veh-f" data-i="' + i + '" data-f="count" value="' + r.count + '" min="0" max="50" step="1"><span class="unit">no.</span></span>' +
+          '<button type="button" class="veh-del" data-i="' + i + '" aria-label="Remove vehicle">×</button>' +
+        '</div>' +
+        '<div class="veh-costs">' +
+          vehCostField(i, 'cost', 'Vehicle', r.cost) +
+          vehCostField(i, 'fuel', 'Fuel', r.fuel) +
+          vehCostField(i, 'maint', 'Maintenance', r.maint) +
+          vehCostField(i, 'repairs', 'Repairs', r.repairs) +
+        '</div>' +
+        '<div class="veh-sub" data-sub="' + i + '"></div>' +
+      '</div>'
+    ).join('');
+    list.querySelectorAll('.veh-type').forEach(sel => sel.addEventListener('change', e => {
+      const i = +e.target.dataset.i; vehicles[i].type = e.target.value; applyVehPreset(vehicles[i]); renderVehicles(); calculate();
+    }));
+    list.querySelectorAll('.veh-f').forEach(inp => inp.addEventListener('input', e => {
+      const i = +e.target.dataset.i, f = e.target.dataset.f;
+      vehicles[i][f] = e.target.value === '' ? 0 : parseFloat(e.target.value);
+      updateVehSubs(); calculate();
+    }));
+    list.querySelectorAll('.veh-del').forEach(btn => btn.addEventListener('click', e => {
+      vehicles.splice(+e.currentTarget.dataset.i, 1); renderVehicles(); calculate();
+    }));
+    updateVehSubs();
+  }
+  (function () {
+    const addBtn = document.getElementById('veh-add');
+    if (addBtn) addBtn.addEventListener('click', () => {
+      const t = VEH_TYPES[0];
+      vehicles.push({ type: t.k, count: 1, cost: t.cost, fuel: t.fuel, maint: t.maint, repairs: t.repairs });
+      renderVehicles(); calculate();
+    });
+  })();
+  renderVehicles();
 
   let editingLift = false;
   function fromLift() {
@@ -1251,9 +1361,9 @@
 
   function collectState() {
     const numbers = {};
-    document.querySelectorAll('input[type=number]').forEach(el => { numbers[el.id] = el.value; });
+    document.querySelectorAll('input[type=number]').forEach(el => { if (el.id) numbers[el.id] = el.value; });
     const selects = {};
-    document.querySelectorAll('select').forEach(el => { selects[el.id] = el.value; });
+    document.querySelectorAll('select').forEach(el => { if (el.id) selects[el.id] = el.value; });
     const radios = {};
     document.querySelectorAll('input[type=radio]').forEach(el => { if (el.checked) radios[el.name] = el.value; });
     const results = {
@@ -1264,7 +1374,7 @@
       perHa: document.getElementById('stat-ha').textContent,
       roi: document.getElementById('stat-roi').textContent
     };
-    return { numbers, selects, radios, drivers: Object.assign({}, state), results };
+    return { numbers, selects, radios, drivers: Object.assign({}, state), vehicles: vehicles.map(r => Object.assign({}, r)), results };
   }
 
   function applyState(s) {
@@ -1299,6 +1409,7 @@
     }
     const sglOn = document.getElementById('sgl_enable').value === 'yes';
     document.querySelectorAll('[data-sgl]').forEach(el => el.style.display = sglOn ? '' : 'none');
+    if (Array.isArray(s.vehicles)) { vehicles = s.vehicles.map(r => Object.assign({}, r)); renderVehicles(); }
     calculate();
   }
 
