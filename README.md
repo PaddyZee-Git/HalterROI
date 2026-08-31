@@ -62,6 +62,16 @@ Maintenance and Repairs** costs. The fleet's total yearly cost × an editable
 profit. The working line shows the fleet cost per year and per month. Vehicles
 persist in saved meetings and auto-resume.
 
+## Additional calculations
+
+A switchable value driver (under Vehicles & maintenance) for anything unique to
+a farm that the standard drivers don't cover. Add free-text line items — a
+description, a yearly $ amount, and whether each **adds value (+)** or is a
+**cost (−)**. The lines net together and, when the driver is toggled on, feed
+the estimated annual profit (it can be positive or negative). The driver value,
+working line, and breakdown all show the signed net, and the items persist in
+saved meetings and auto-resume.
+
 ## Assumptions panel
 
 A collapsible "Assumptions" section exposes the benchmark constants used by the

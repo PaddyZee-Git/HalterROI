@@ -414,6 +414,15 @@
   .btn-add-veh:hover { border-color: var(--halter-cactus); }
   @media (max-width: 560px) { .veh-costs { grid-template-columns: 1fr; } }
 
+  .extra-row { border: 1px solid var(--halter-mist); border-radius: var(--radius-md); padding: 12px 14px; background: var(--halter-white); }
+  .extra-top { display: flex; align-items: center; gap: 10px; }
+  .extra-desc { flex: 1; min-width: 0; height: 44px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); background: var(--halter-white); padding: 0 14px; font: inherit; font-size: 16px; color: var(--halter-ink); outline: none; }
+  .extra-desc:focus { border-color: var(--halter-cactus); }
+  .extra-del { flex: none; width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--halter-mist); background: var(--halter-white); color: var(--halter-graphite); font-size: 20px; line-height: 1; cursor: pointer; }
+  .extra-del:hover { border-color: var(--halter-danger); color: var(--halter-danger); }
+  .extra-bot { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .extra-bot select { flex: none; width: auto; min-width: 150px; }
+
   @media print {
     @page { margin: 14mm; }
     html, body { background: #fff !important; }
@@ -800,6 +809,21 @@
             </div>
           </div>
 
+          <div class="driver" data-driver="extra">
+            <div class="dhead">
+              <button class="dtog" data-tog="extra" aria-label="Toggle additional calculations"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h8"/><path d="M8 18h4"/></svg></span>
+              <div class="dmeta"><h3>Additional calculations</h3><p>Custom value or cost items unique to this operation</p></div>
+              <div class="dval" data-dv="extra">—</div>
+              <svg class="chev" data-chev="extra" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="extra">
+              <div id="extra-list" class="veh-list"></div>
+              <button type="button" id="extra-add" class="btn-add-veh">+ Add line</button>
+              <div class="calc-note" data-calc="extra"></div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -980,10 +1004,11 @@
 </footer>
 
 <script>
-  const DRIVERS = ['pasture','quality','repro','lameness','labour','winter','vehicles'];
+  const DRIVERS = ['pasture','quality','repro','lameness','labour','winter','vehicles','extra'];
   const LABELS = {
     pasture: 'Pasture utilisation', quality: 'Pasture quality', repro: 'Reproduction',
-    lameness: 'Lameness', labour: 'Labour', winter: 'Winter crop', vehicles: 'Vehicles & maintenance'
+    lameness: 'Lameness', labour: 'Labour', winter: 'Winter crop', vehicles: 'Vehicles & maintenance',
+    extra: 'Additional calculations'
   };
   const state = { pasture:true, quality:false, repro:true, lameness:false, labour:false, winter:false };
 
@@ -1091,14 +1116,17 @@
     const vals = {
       pasture: calcPasture(), quality: calcQuality(), repro: calcRepro(),
       lameness: calcLameness(), labour: calcLabour(), winter: calcWinter(),
-      vehicles: (typeof calcVehicles === 'function' ? calcVehicles() : 0)
+      vehicles: (typeof calcVehicles === 'function' ? calcVehicles() : 0),
+      extra: (typeof calcExtra === 'function' ? calcExtra() : 0)
     };
 
     // Per-driver readouts
     DRIVERS.forEach(k => {
       const el = document.querySelector('[data-dv="'+k+'"]');
-      if (state[k] && vals[k] > 0) { el.textContent = fmt(vals[k]); el.classList.add('lit'); }
-      else { el.textContent = state[k] ? '$0' : '—'; el.classList.remove('lit'); }
+      if (!state[k]) { el.textContent = '—'; el.classList.remove('lit'); return; }
+      if (k === 'extra') { el.textContent = fmtSigned(vals[k]); el.classList.toggle('lit', vals[k] !== 0); return; }
+      if (vals[k] > 0) { el.textContent = fmt(vals[k]); el.classList.add('lit'); }
+      else { el.textContent = '$0'; el.classList.remove('lit'); }
     });
 
     const gross = DRIVERS.reduce((a, k) => a + vals[k], 0);
@@ -1124,7 +1152,7 @@
     // Breakdown
     document.getElementById('breakdown').innerHTML = DRIVERS.map(k =>
       '<div class="brow"><span class="bname">' + LABELS[k] + '</span>' +
-      '<span class="bamt ' + (state[k] ? '' : 'off') + '">' + (state[k] ? fmt(vals[k]) : 'off') + '</span></div>'
+      '<span class="bamt ' + (state[k] ? '' : 'off') + '">' + (state[k] ? (k === 'extra' ? fmtSigned(vals[k]) : fmt(vals[k])) : 'off') + '</span></div>'
     ).join('');
 
     // Pasture-use conditional field
@@ -1342,6 +1370,10 @@
       const total = fleetAnnual(), red = v('veh_reduction');
       return 'Fleet ' + fmt(total) + '/yr (' + fmt(total / 12) + '/mo) × ' + red + '% reduction = ' + fmt(total * red / 100);
     }
+    if (k === 'extra') {
+      const parts = extras.filter(r => (Number(r.amount) || 0) !== 0).map(r => ((r.label || '').trim() || 'Item') + ' ' + (r.type === 'cost' ? '−' : '+') + fmt(Number(r.amount) || 0));
+      return parts.length ? parts.join(' · ') + ' = ' + fmtSigned(extrasNet()) : 'No items added yet.';
+    }
     return '';
   }
   function updateWorkings() {
@@ -1418,6 +1450,47 @@
   })();
   renderVehicles();
 
+  state.extra = false;
+  const EXTRA_TYPES = [{ k: 'value', name: 'Adds value (+)' }, { k: 'cost', name: 'Cost (−)' }];
+  let extras = [{ label: '', amount: 0, type: 'value' }];
+  function escAttr(s) { return (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function extrasNet() { return extras.reduce((a, r) => a + (r.type === 'cost' ? -1 : 1) * (Number(r.amount) || 0), 0); }
+  function calcExtra() { return state.extra ? extrasNet() : 0; }
+  function renderExtras() {
+    const list = document.getElementById('extra-list');
+    if (!list) return;
+    list.innerHTML = extras.map((r, i) =>
+      '<div class="extra-row">' +
+        '<div class="extra-top">' +
+          '<input type="text" class="extra-f extra-desc" data-i="' + i + '" data-f="label" value="' + escAttr(r.label) + '" placeholder="Description (e.g. effluent savings)">' +
+          '<button type="button" class="extra-del" data-i="' + i + '" aria-label="Remove line">×</button>' +
+        '</div>' +
+        '<div class="extra-bot">' +
+          '<span class="pill"><input type="number" class="extra-f" data-i="' + i + '" data-f="amount" value="' + r.amount + '" min="0" max="10000000" step="50"><span class="unit">$/yr</span></span>' +
+          '<select class="extra-type" data-i="' + i + '">' + EXTRA_TYPES.map(t => '<option value="' + t.k + '"' + (r.type === t.k ? ' selected' : '') + '>' + t.name + '</option>').join('') + '</select>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+    list.querySelectorAll('.extra-f').forEach(inp => inp.addEventListener('input', e => {
+      const i = +e.target.dataset.i, f = e.target.dataset.f;
+      extras[i][f] = f === 'amount' ? (e.target.value === '' ? 0 : parseFloat(e.target.value)) : e.target.value;
+      calculate();
+    }));
+    list.querySelectorAll('.extra-type').forEach(sel => sel.addEventListener('change', e => {
+      extras[+e.target.dataset.i].type = e.target.value; calculate();
+    }));
+    list.querySelectorAll('.extra-del').forEach(btn => btn.addEventListener('click', e => {
+      extras.splice(+e.currentTarget.dataset.i, 1);
+      if (!extras.length) extras.push({ label: '', amount: 0, type: 'value' });
+      renderExtras(); calculate();
+    }));
+  }
+  (function () {
+    const addBtn = document.getElementById('extra-add');
+    if (addBtn) addBtn.addEventListener('click', () => { extras.push({ label: '', amount: 0, type: 'value' }); renderExtras(); calculate(); });
+  })();
+  renderExtras();
+
   let editingLift = false;
   function fromLift() {
     editingLift = true;
@@ -1454,7 +1527,7 @@
       roi: document.getElementById('stat-roi').textContent
     };
     const notesEl = document.getElementById('meeting_notes');
-    return { numbers, selects, radios, drivers: Object.assign({}, state), vehicles: vehicles.map(r => Object.assign({}, r)), notes: notesEl ? notesEl.value : '', results };
+    return { numbers, selects, radios, drivers: Object.assign({}, state), vehicles: vehicles.map(r => Object.assign({}, r)), extras: extras.map(r => Object.assign({}, r)), notes: notesEl ? notesEl.value : '', results };
   }
 
   function applyState(s) {
@@ -1490,6 +1563,7 @@
     const sglOn = document.getElementById('sgl_enable').value === 'yes';
     document.querySelectorAll('[data-sgl]').forEach(el => el.style.display = sglOn ? '' : 'none');
     if (Array.isArray(s.vehicles)) { vehicles = s.vehicles.map(r => Object.assign({}, r)); renderVehicles(); }
+    if (Array.isArray(s.extras)) { extras = s.extras.length ? s.extras.map(r => Object.assign({}, r)) : [{ label: '', amount: 0, type: 'value' }]; renderExtras(); }
     const notesEl = document.getElementById('meeting_notes');
     if (notesEl) notesEl.value = s.notes || '';
     calculate();
