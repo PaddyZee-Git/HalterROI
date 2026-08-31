@@ -391,6 +391,10 @@
 
   .notes-panel { margin: 0 0 20px; }
   .meeting-actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 0 0 30px; }
+  .newmeeting-row { text-align: center; margin: 8px 0 56px; }
+  .btn-newmeeting { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); background: transparent; color: var(--halter-graphite); font-size: 13px; font-weight: 500; transition: border-color .15s var(--ease), color .15s var(--ease); }
+  .btn-newmeeting:hover { border-color: var(--halter-danger); color: var(--halter-danger); }
+  .btn-newmeeting svg { width: 15px; height: 15px; }
   .notes-field label { display: block; font-size: 14px; font-weight: 500; color: var(--halter-ink); margin-bottom: 9px; }
   #meeting_notes { width: 100%; min-height: 76px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); background: var(--halter-white); padding: 12px 14px; font: inherit; font-size: 16px; line-height: 1.5; color: var(--halter-ink); outline: none; resize: vertical; transition: border-color .15s var(--ease); }
   #meeting_notes:focus { border-color: var(--halter-cactus); }
@@ -448,10 +452,6 @@
           <label for="meeting_name">Meeting name</label>
           <input type="text" id="meeting_name" placeholder="e.g. Smith Farm — Waikato, Aug 2026" autocomplete="off">
         </div>
-        <button type="button" id="new-meeting" class="btn-print">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
-          New meeting
-        </button>
       </div>
 
       <!-- Section 1 — Farm -->
@@ -959,6 +959,13 @@
     </div>
     <div id="saved-empty" class="saved-empty">No saved meetings yet. Enter a meeting name above and tap “Save meeting” to keep this calculation on this device.</div>
     <div id="saved-list"></div>
+  </div>
+
+  <div class="newmeeting-row">
+    <button type="button" id="new-meeting" class="btn-newmeeting">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
+      Start a new meeting
+    </button>
   </div>
 </div>
 
