@@ -414,14 +414,28 @@
   .btn-add-veh:hover { border-color: var(--halter-cactus); }
   @media (max-width: 560px) { .veh-costs { grid-template-columns: 1fr; } }
 
-  .extra-row { border: 1px solid var(--halter-mist); border-radius: var(--radius-md); padding: 12px 14px; background: var(--halter-white); }
+  .extra-row { border: 1px solid var(--halter-mist); border-radius: var(--radius-md); padding: 14px; background: var(--halter-white); }
+  .extra-row + .extra-row { margin-top: 12px; }
   .extra-top { display: flex; align-items: center; gap: 10px; }
-  .extra-desc { flex: 1; min-width: 0; height: 44px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); background: var(--halter-white); padding: 0 14px; font: inherit; font-size: 16px; color: var(--halter-ink); outline: none; }
-  .extra-desc:focus { border-color: var(--halter-cactus); }
-  .extra-del { flex: none; width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--halter-mist); background: var(--halter-white); color: var(--halter-graphite); font-size: 20px; line-height: 1; cursor: pointer; }
+  .extra-title { flex: 1; min-width: 0; height: 52px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); background: var(--halter-white); padding: 0 14px; font: inherit; font-size: 17px; color: var(--halter-ink); outline: none; }
+  .extra-title:focus { border-color: var(--halter-cactus); }
+  .extra-del { flex: none; width: 44px; height: 44px; border-radius: var(--radius-sm); border: 1px solid var(--halter-mist); background: var(--halter-white); color: var(--halter-graphite); font-size: 22px; line-height: 1; cursor: pointer; }
   .extra-del:hover { border-color: var(--halter-danger); color: var(--halter-danger); }
+  .extra-calc { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .extra-expr { flex: 1; min-width: 0; height: 58px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); background: var(--halter-platinum); padding: 0 16px; font: inherit; font-size: 21px; letter-spacing: 0.02em; color: var(--halter-ink); outline: none; font-variant-numeric: tabular-nums; }
+  .extra-expr:focus { border-color: var(--halter-green); background: var(--halter-white); }
+  .extra-eq { flex: none; min-width: 104px; text-align: right; font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--halter-graphite); white-space: nowrap; }
+  .extra-eq.lit { color: var(--halter-green); }
+  .extra-eq.neg { color: var(--halter-danger); }
   .extra-bot { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
   .extra-bot select { flex: none; width: auto; min-width: 150px; }
+  .extra-pad { margin-top: 14px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 380px; }
+  .extra-key { height: 54px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); background: var(--halter-white); color: var(--halter-ink); font-size: 21px; font-weight: 500; cursor: pointer; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+  .extra-key:active { background: var(--halter-mint-cream); }
+  .extra-key.op { color: var(--halter-cactus); }
+  .extra-key.eq { background: var(--halter-green); color: #fff; border-color: var(--halter-green); }
+  .extra-key.clr { color: var(--halter-danger); }
+  .extra-pad-hint { margin-top: 10px; font-size: 12px; line-height: 1.5; color: var(--halter-graphite); max-width: 380px; }
 
   @media print {
     @page { margin: 14mm; }
@@ -819,7 +833,9 @@
             </div>
             <div class="dbody" data-body="extra">
               <div id="extra-list" class="veh-list"></div>
-              <button type="button" id="extra-add" class="btn-add-veh">+ Add line</button>
+              <button type="button" id="extra-add" class="btn-add-veh">Add item</button>
+              <div class="extra-pad" id="extra-pad"></div>
+              <div class="extra-pad-hint">Tap a calculation field and write the sum with your pen (e.g. 3000 − 1200 + 500) — iPad handwriting turns it into numbers and it works out the total as you go. Or use the keypad. Set each item to add value or be a cost.</div>
               <div class="calc-note" data-calc="extra"></div>
             </div>
           </div>
@@ -1371,8 +1387,12 @@
       return 'Fleet ' + fmt(total) + '/yr (' + fmt(total / 12) + '/mo) × ' + red + '% reduction = ' + fmt(total * red / 100);
     }
     if (k === 'extra') {
-      const parts = extras.filter(r => (Number(r.amount) || 0) !== 0).map(r => ((r.label || '').trim() || 'Item') + ' ' + (r.type === 'cost' ? '−' : '+') + fmt(Number(r.amount) || 0));
-      return parts.length ? parts.join(' · ') + ' = ' + fmtSigned(extrasNet()) : 'No items added yet.';
+      const parts = extras.filter(r => { const n = evalExpr(r.expr); return isFinite(n) && n !== 0; }).map(r => {
+        const label = (r.label || '').trim() || 'Item';
+        const ex = String(r.expr || '').trim();
+        return label + (ex ? ' (' + ex + ')' : '') + ' = ' + fmtSigned(extraContribution(r));
+      });
+      return parts.length ? parts.join(' · ') + '  ·  Net = ' + fmtSigned(extrasNet()) : 'No items added yet.';
     }
     return '';
   }
@@ -1452,42 +1472,149 @@
 
   state.extra = false;
   const EXTRA_TYPES = [{ k: 'value', name: 'Adds value (+)' }, { k: 'cost', name: 'Cost (−)' }];
-  let extras = [{ label: '', amount: 0, type: 'value' }];
+  let extras = [{ label: '', expr: '', type: 'value' }];
+  let activeExpr = null;
   function escAttr(s) { return (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-  function extrasNet() { return extras.reduce((a, r) => a + (r.type === 'cost' ? -1 : 1) * (Number(r.amount) || 0), 0); }
+  function evalExpr(raw) {
+    if (raw == null) return NaN;
+    let s = String(raw).replace(/[×xX]/g, '*').replace(/÷/g, '/').replace(/[−–—]/g, '-').replace(/[,$\s=]/g, '');
+    if (!s || !/^[0-9+\-*/().]+$/.test(s)) return NaN;
+    let i = 0;
+    function expr() {
+      let v = term(); if (v === null) return null;
+      while (s[i] === '+' || s[i] === '-') { const o = s[i++]; const r = term(); if (r === null) return null; v = o === '+' ? v + r : v - r; }
+      return v;
+    }
+    function term() {
+      let v = factor(); if (v === null) return null;
+      while (s[i] === '*' || s[i] === '/') { const o = s[i++]; const r = factor(); if (r === null) return null; if (o === '/') { if (r === 0) return null; v /= r; } else v *= r; }
+      return v;
+    }
+    function factor() {
+      if (s[i] === '+') { i++; return factor(); }
+      if (s[i] === '-') { i++; const v = factor(); return v === null ? null : -v; }
+      if (s[i] === '(') { i++; const v = expr(); if (v === null || s[i] !== ')') return null; i++; return v; }
+      const m = /^(\d+\.?\d*|\.\d+)/.exec(s.slice(i));
+      if (!m) return null;
+      i += m[0].length; return parseFloat(m[0]);
+    }
+    const val = expr();
+    if (val === null || i !== s.length || !isFinite(val)) return NaN;
+    return val;
+  }
+  function extraVal(r) { const n = evalExpr(r.expr); return isFinite(n) ? n : 0; }
+  function extraContribution(r) { return (r.type === 'cost' ? -1 : 1) * extraVal(r); }
+  function extrasNet() { return extras.reduce((a, r) => a + extraContribution(r), 0); }
   function calcExtra() { return state.extra ? extrasNet() : 0; }
+  function updateExtraEq(row, i) {
+    if (!row) return;
+    const eq = row.querySelector('.extra-eq');
+    if (!eq) return;
+    const n = evalExpr(extras[i].expr);
+    if (!isFinite(n)) { eq.textContent = ''; eq.classList.remove('lit', 'neg'); return; }
+    const c = (extras[i].type === 'cost' ? -1 : 1) * n;
+    eq.textContent = '= ' + fmtSigned(c);
+    eq.classList.add('lit');
+    eq.classList.toggle('neg', c < 0);
+  }
   function renderExtras() {
     const list = document.getElementById('extra-list');
     if (!list) return;
     list.innerHTML = extras.map((r, i) =>
-      '<div class="extra-row">' +
+      '<div class="extra-row" data-row="' + i + '">' +
         '<div class="extra-top">' +
-          '<input type="text" class="extra-f extra-desc" data-i="' + i + '" data-f="label" value="' + escAttr(r.label) + '" placeholder="Description (e.g. effluent savings)">' +
-          '<button type="button" class="extra-del" data-i="' + i + '" aria-label="Remove line">×</button>' +
+          '<input type="text" class="extra-title" data-i="' + i + '" data-f="label" value="' + escAttr(r.label) + '" placeholder="Title (e.g. effluent savings)">' +
+          '<button type="button" class="extra-del" data-i="' + i + '" aria-label="Remove item">×</button>' +
+        '</div>' +
+        '<div class="extra-calc">' +
+          '<input type="text" class="extra-expr" data-i="' + i + '" data-f="expr" inputmode="text" autocomplete="off" autocorrect="off" spellcheck="false" value="' + escAttr(r.expr) + '" placeholder="Write the sum, e.g. 3000 − 1200 + 500">' +
+          '<span class="extra-eq"></span>' +
         '</div>' +
         '<div class="extra-bot">' +
-          '<span class="pill"><input type="number" class="extra-f" data-i="' + i + '" data-f="amount" value="' + r.amount + '" min="0" max="10000000" step="50"><span class="unit">$/yr</span></span>' +
           '<select class="extra-type" data-i="' + i + '">' + EXTRA_TYPES.map(t => '<option value="' + t.k + '"' + (r.type === t.k ? ' selected' : '') + '>' + t.name + '</option>').join('') + '</select>' +
         '</div>' +
       '</div>'
     ).join('');
-    list.querySelectorAll('.extra-f').forEach(inp => inp.addEventListener('input', e => {
+    list.querySelectorAll('.extra-title, .extra-expr').forEach(inp => inp.addEventListener('input', e => {
       const i = +e.target.dataset.i, f = e.target.dataset.f;
-      extras[i][f] = f === 'amount' ? (e.target.value === '' ? 0 : parseFloat(e.target.value)) : e.target.value;
+      let val = e.target.value;
+      if (f === 'expr' && val.indexOf('=') !== -1) { val = val.replace(/=/g, ''); e.target.value = val; }
+      extras[i][f] = val;
+      if (f === 'expr') updateExtraEq(e.target.closest('.extra-row'), i);
       calculate();
     }));
+    list.querySelectorAll('.extra-expr').forEach(inp => inp.addEventListener('focus', e => { activeExpr = e.target; }));
     list.querySelectorAll('.extra-type').forEach(sel => sel.addEventListener('change', e => {
-      extras[+e.target.dataset.i].type = e.target.value; calculate();
+      const i = +e.target.dataset.i;
+      extras[i].type = e.target.value;
+      updateExtraEq(e.target.closest('.extra-row'), i);
+      calculate();
     }));
     list.querySelectorAll('.extra-del').forEach(btn => btn.addEventListener('click', e => {
       extras.splice(+e.currentTarget.dataset.i, 1);
-      if (!extras.length) extras.push({ label: '', amount: 0, type: 'value' });
+      if (!extras.length) extras.push({ label: '', expr: '', type: 'value' });
+      activeExpr = null;
       renderExtras(); calculate();
     }));
+    list.querySelectorAll('.extra-row').forEach((row, i) => updateExtraEq(row, i));
+  }
+  function extraTarget() {
+    if (activeExpr && activeExpr.isConnected) return activeExpr;
+    const all = document.querySelectorAll('.extra-expr');
+    return all.length ? all[all.length - 1] : null;
+  }
+  function extraInsert(ch) {
+    const t = extraTarget(); if (!t) return;
+    t.focus();
+    const start = t.selectionStart == null ? t.value.length : t.selectionStart;
+    const end = t.selectionEnd == null ? t.value.length : t.selectionEnd;
+    t.value = t.value.slice(0, start) + ch + t.value.slice(end);
+    const pos = start + ch.length;
+    try { t.setSelectionRange(pos, pos); } catch (e) {}
+    activeExpr = t;
+    t.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  function extraBackspace() {
+    const t = extraTarget(); if (!t) return;
+    t.focus();
+    let start = t.selectionStart == null ? t.value.length : t.selectionStart;
+    const end = t.selectionEnd == null ? t.value.length : t.selectionEnd;
+    if (start === end && start > 0) start--;
+    t.value = t.value.slice(0, start) + t.value.slice(end);
+    try { t.setSelectionRange(start, start); } catch (e) {}
+    activeExpr = t;
+    t.dispatchEvent(new Event('input', { bubbles: true }));
   }
   (function () {
+    const pad = document.getElementById('extra-pad');
+    if (pad) {
+      const KEYS = [
+        { t: '7' }, { t: '8' }, { t: '9' }, { t: '÷', ins: '/', c: 'op' },
+        { t: '4' }, { t: '5' }, { t: '6' }, { t: '×', ins: '*', c: 'op' },
+        { t: '1' }, { t: '2' }, { t: '3' }, { t: '−', ins: '-', c: 'op' },
+        { t: '0' }, { t: '.' }, { t: '⌫', act: 'back', c: 'clr' }, { t: '+', ins: '+', c: 'op' },
+        { t: 'C', act: 'clear', c: 'clr' }, { t: '(', c: 'op' }, { t: ')', c: 'op' }, { t: '=', act: 'eq', c: 'eq' }
+      ];
+      pad.innerHTML = KEYS.map(k => '<button type="button" class="extra-key' + (k.c ? ' ' + k.c : '') + '" data-ins="' + escAttr(k.ins || k.t) + '"' + (k.act ? ' data-act="' + k.act + '"' : '') + '>' + k.t + '</button>').join('');
+      pad.addEventListener('mousedown', e => { if (e.target.closest('.extra-key')) e.preventDefault(); });
+      pad.addEventListener('click', e => {
+        const btn = e.target.closest('.extra-key');
+        if (!btn) return;
+        const act = btn.dataset.act;
+        if (act === 'back') return extraBackspace();
+        if (act === 'clear') { const t = extraTarget(); if (t) { t.value = ''; activeExpr = t; t.focus(); t.dispatchEvent(new Event('input', { bubbles: true })); } return; }
+        if (act === 'eq') { const t = extraTarget(); if (t) t.focus(); return; }
+        extraInsert(btn.dataset.ins);
+      });
+    }
     const addBtn = document.getElementById('extra-add');
-    if (addBtn) addBtn.addEventListener('click', () => { extras.push({ label: '', amount: 0, type: 'value' }); renderExtras(); calculate(); });
+    if (addBtn) addBtn.addEventListener('click', () => {
+      extras.push({ label: '', expr: '', type: 'value' });
+      renderExtras(); calculate();
+      const all = document.querySelectorAll('.extra-expr');
+      const last = all[all.length - 1];
+      if (last) { activeExpr = last; last.focus(); }
+    });
   })();
   renderExtras();
 
@@ -1563,7 +1690,13 @@
     const sglOn = document.getElementById('sgl_enable').value === 'yes';
     document.querySelectorAll('[data-sgl]').forEach(el => el.style.display = sglOn ? '' : 'none');
     if (Array.isArray(s.vehicles)) { vehicles = s.vehicles.map(r => Object.assign({}, r)); renderVehicles(); }
-    if (Array.isArray(s.extras)) { extras = s.extras.length ? s.extras.map(r => Object.assign({}, r)) : [{ label: '', amount: 0, type: 'value' }]; renderExtras(); }
+    if (Array.isArray(s.extras)) {
+      extras = s.extras.length
+        ? s.extras.map(r => ({ label: r.label || '', expr: r.expr != null ? String(r.expr) : (r.amount != null ? String(r.amount) : ''), type: r.type || 'value' }))
+        : [{ label: '', expr: '', type: 'value' }];
+      activeExpr = null;
+      renderExtras();
+    }
     const notesEl = document.getElementById('meeting_notes');
     if (notesEl) notesEl.value = s.notes || '';
     calculate();

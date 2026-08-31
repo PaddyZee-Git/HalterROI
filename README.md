@@ -65,12 +65,22 @@ persist in saved meetings and auto-resume.
 ## Additional calculations
 
 A switchable value driver (under Vehicles & maintenance) for anything unique to
-a farm that the standard drivers don't cover. Add free-text line items — a
-description, a yearly $ amount, and whether each **adds value (+)** or is a
-**cost (−)**. The lines net together and, when the driver is toggled on, feed
-the estimated annual profit (it can be positive or negative). The driver value,
-working line, and breakdown all show the signed net, and the items persist in
-saved meetings and auto-resume.
+a farm that the standard drivers don't cover. Add **items** — each with a
+**title**, a **calculation**, and whether it **adds value (+)** or is a
+**cost (−)** — and tap **Add item** to keep adding more.
+
+Each item has a live calculator field: write a sum such as `3000 - 1200 + 500`
+and it evaluates to `= +$2,300` as you type, no need to press equals. On an
+iPad you can write the sum straight into the field with the Apple Pencil —
+iPadOS handwriting (Scribble) turns it into the digits and operators — or use
+the large on-screen keypad (`7 8 9 ÷`, `4 5 6 ×`, …, with `⌫`, `C`, `( )` and
+`=`). The evaluator supports `+ − × ÷`, parentheses, and decimals (a safe
+expression parser — no `eval`).
+
+The items net together and, when the driver is toggled on, feed the estimated
+annual profit (which can go up or down). The driver value, each item's readout,
+the working line, and the breakdown all show the signed figure, and the items
+(titles and their sums) persist in saved meetings and auto-resume.
 
 ## Assumptions panel
 
