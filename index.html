@@ -391,19 +391,11 @@
   .pr-scell span { display: block; font-size: 11px; color: var(--halter-graphite); }
   .pr-scell b { font-size: 12px; font-variant-numeric: tabular-nums; }
   .pr-scell.cur { background: var(--halter-mint-cream); border-color: var(--halter-sage); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .pr-notes { margin-top: 20px; }
-  .pr-notes h2 { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--halter-ink); margin: 0 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--halter-mist); }
-  .pr-notes-body { font-size: 12px; color: var(--halter-ink); line-height: 1.5; white-space: pre-wrap; }
 
   .pill { padding: 10px 14px; min-width: 128px; font-size: 17px; }
   .pill input { width: 90px; font-size: 17px; }
   .pill .unit { font-size: 13px; }
   #meeting_name { height: 52px; font-size: 17px; }
-
-  .notes-field { padding-bottom: 22px; margin-bottom: 26px; border-bottom: 1px solid var(--halter-mist); }
-  .notes-field label { display: block; font-size: 14px; font-weight: 500; color: var(--halter-ink); margin-bottom: 9px; }
-  #meeting_notes { width: 100%; min-height: 76px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); background: var(--halter-white); padding: 12px 14px; font: inherit; font-size: 16px; line-height: 1.5; color: var(--halter-ink); outline: none; resize: vertical; transition: border-color .15s var(--ease); }
-  #meeting_notes:focus { border-color: var(--halter-cactus); }
 
   .veh-list { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
   .veh-row { border: 1px solid var(--halter-mist); border-radius: var(--radius-md); padding: 12px 14px; background: var(--halter-white); }
@@ -470,10 +462,6 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
           New meeting
         </button>
-      </div>
-      <div class="notes-field">
-        <label for="meeting_notes">Notes</label>
-        <textarea id="meeting_notes" rows="3" placeholder="Notes for this meeting — context, follow-ups, caveats…"></textarea>
       </div>
 
       <!-- Section 1 — Farm -->
@@ -1277,10 +1265,6 @@
     });
     document.querySelectorAll('#assump-body input[type=number]').forEach(el => el.addEventListener('input', calculate));
   })();
-  (function wireNotes() {
-    const el = document.getElementById('meeting_notes');
-    if (el) el.addEventListener('input', () => { if (typeof autoSave === 'function') autoSave(); });
-  })();
 
   const fmtShort = n => { const a = Math.round(n); return Math.abs(a) >= 1e6 ? '$' + (a / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M' : '$' + a.toLocaleString('en-NZ'); };
   function updateHerd() {
@@ -1481,8 +1465,7 @@
       perHa: document.getElementById('stat-ha').textContent,
       roi: document.getElementById('stat-roi').textContent
     };
-    const notesEl = document.getElementById('meeting_notes');
-    return { numbers, selects, radios, drivers: Object.assign({}, state), vehicles: vehicles.map(r => Object.assign({}, r)), notes: notesEl ? notesEl.value : '', results };
+    return { numbers, selects, radios, drivers: Object.assign({}, state), vehicles: vehicles.map(r => Object.assign({}, r)), results };
   }
 
   function applyState(s) {
@@ -1518,8 +1501,6 @@
     const sglOn = document.getElementById('sgl_enable').value === 'yes';
     document.querySelectorAll('[data-sgl]').forEach(el => el.style.display = sglOn ? '' : 'none');
     if (Array.isArray(s.vehicles)) { vehicles = s.vehicles.map(r => Object.assign({}, r)); renderVehicles(); }
-    const notesEl = document.getElementById('meeting_notes');
-    if (notesEl) notesEl.value = s.notes || '';
     calculate();
   }
 
@@ -1633,7 +1614,6 @@
           '<h2>How each value is calculated</h2><div class="pr-assump" data-assump></div>' +
         '</div>' +
       '</div>' +
-      '<div class="pr-notes" data-notes hidden><h2>Notes</h2><div class="pr-notes-body"></div></div>' +
       '<div class="pr-foot">Halter dairy ROI calculator · For account manager use · Figures are estimates based on farm inputs and published DairyNZ benchmarks</div>';
 
     rep.querySelector('.pr-name').textContent = name;
@@ -1687,13 +1667,6 @@
     if (state.freight) dnote.push('freight $' + FREIGHT_COST.toLocaleString('en-NZ'));
     if (state.connectivity) dnote.push(pv('props_count') + ' × property @ $' + CONNECT_COST.toLocaleString('en-NZ') + '/yr');
     rep.querySelector('[data-deploynote]').textContent = dnote.join(' · ');
-
-    const notesVal = (document.getElementById('meeting_notes') || {}).value || '';
-    const nEl = rep.querySelector('[data-notes]');
-    if (nEl) {
-      if (notesVal.trim()) { nEl.hidden = false; nEl.querySelector('.pr-notes-body').textContent = notesVal; }
-      else { nEl.hidden = true; }
-    }
 
     const kv = rep.querySelector('[data-kv]');
     [

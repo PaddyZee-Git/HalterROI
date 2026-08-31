@@ -90,11 +90,6 @@ These sum to a **Total deployment cost** shown in the results. Deployment is a
 one-off setup cost, so it is reported separately and does **not** reduce the
 annual net value (which stays a clean per-year figure).
 
-## Meeting notes
-
-A free-text **Notes** box under the meeting bar. Notes save with the meeting and
-auto-resume, and print on the report (under a "Notes" heading) when present.
-
 ## New meeting
 
 A "New meeting" button in the meeting bar resets every section back to defaults —
