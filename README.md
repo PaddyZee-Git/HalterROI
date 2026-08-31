@@ -71,12 +71,6 @@ drivers so they can be adjusted per farm/region: 6-week in-calf value ($/cow per
 calculations and the "how this is calculated" working lines, and persist in
 saved meetings.
 
-## Milk-price sensitivity
-
-The results panel shows a "Net profit at different milk prices" strip — net at
-the current milk price ±$2 (five columns, current highlighted) — so the ROI can
-be shown holding up across a milk-price swing. It also appears in the report.
-
 ## Deployment cost
 
 A "Deployment cost" section (after the value drivers) estimates the one-off cost

@@ -315,12 +315,6 @@
 
   .breakdown-label .one-off { color: rgba(255,255,255,0.5); font-weight: 500; }
 
-  .sens { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
-  .scell { background: rgba(255,255,255,0.06); border-radius: var(--radius-sm); padding: 10px 4px; text-align: center; min-width: 0; }
-  .scell .p { font-size: 12px; color: rgba(255,255,255,0.6); }
-  .scell .n { font-family: var(--mono); font-size: 13px; font-weight: 600; margin-top: 5px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .scell.cur { background: rgba(255,255,255,0.14); outline: 1px solid var(--halter-lime); }
-  .scell.cur .p { color: var(--halter-lime); }
 
   .calc-note { background: var(--halter-platinum); border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); padding: 11px 13px; margin-top: 14px; line-height: 1.5; }
   .calc-note strong { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--halter-ink); font-weight: 600; margin-bottom: 3px; }
@@ -386,11 +380,6 @@
   .pr-aname { font-weight: 600; color: var(--halter-ink); }
   .pr-adesc { color: var(--halter-graphite); margin-top: 1px; line-height: 1.4; }
   .pr-foot { margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--halter-mist); font-size: 11px; color: var(--halter-graphite); text-align: center; }
-  .pr-sens { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 2px; }
-  .pr-scell { border: 1px solid var(--halter-mist); border-radius: 8px; padding: 8px 4px; text-align: center; }
-  .pr-scell span { display: block; font-size: 11px; color: var(--halter-graphite); }
-  .pr-scell b { font-size: 12px; font-variant-numeric: tabular-nums; }
-  .pr-scell.cur { background: var(--halter-mint-cream); border-color: var(--halter-sage); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .pr-notes { margin-top: 20px; }
   .pr-notes h2 { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--halter-ink); margin: 0 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--halter-mist); }
   .pr-notes-body { font-size: 12px; color: var(--halter-ink); line-height: 1.5; white-space: pre-wrap; }
@@ -939,9 +928,6 @@
         <div class="stat"><div class="k">Return</div><div class="v" id="stat-roi">—</div></div>
       </div>
 
-      <div class="breakdown-label">Net profit at different milk prices</div>
-      <div class="sens" id="sens"></div>
-
       <div class="breakdown-label">Where the value comes from</div>
       <div class="breakdown" id="breakdown"></div>
 
@@ -1139,7 +1125,6 @@
     if (typeof updatePastureLink === 'function') updatePastureLink();
     if (typeof updateHerd === 'function') updateHerd();
     if (typeof updateWorkings === 'function') updateWorkings();
-    if (typeof updateSensitivity === 'function') updateSensitivity();
     if (typeof autoSave === 'function') autoSave();
   }
 
@@ -1433,39 +1418,6 @@
     if (liftRng) liftRng.value = pct;
   }
 
-  function fmtSens(n) {
-    const a = Math.round(n), s = a > 0 ? '+' : a < 0 ? '-' : '', abs = Math.abs(a);
-    if (abs >= 1e6) return s + '$' + (abs / 1e6).toFixed(1) + 'M';
-    if (abs >= 10000) return s + '$' + Math.round(abs / 1000) + 'k';
-    if (abs >= 1000) return s + '$' + (abs / 1000).toFixed(1) + 'k';
-    return s + '$' + abs;
-  }
-  function priceRange() {
-    const base = v('milkprice');
-    const clamp = x => Math.min(15, Math.max(4, x));
-    return [-2, -1, 0, 1, 2].map(off => clamp(Math.round((base + off) * 100) / 100));
-  }
-  function netAtMilkPrice(mp) {
-    const el = document.getElementById('milkprice');
-    const orig = el.value;
-    el.value = mp;
-    let gross = calcPasture() + calcQuality() + calcRepro() + calcLameness() + calcLabour() + calcWinter();
-    if (typeof calcVehicles === 'function') gross += calcVehicles();
-    el.value = orig;
-    return gross - v('cows') * v('collar') * 12;
-  }
-  function updateSensitivity() {
-    const el = document.getElementById('sens');
-    if (!el) return;
-    const cur = v('milkprice'), prices = priceRange();
-    el.innerHTML = prices.map(mp => '<div class="scell' + (Math.abs(mp - cur) < 0.005 ? ' cur' : '') + '"><div class="p"></div><div class="n"></div></div>').join('');
-    const cells = el.querySelectorAll('.scell');
-    prices.forEach((mp, i) => {
-      cells[i].querySelector('.p').textContent = '$' + (Math.round(mp * 100) / 100);
-      cells[i].querySelector('.n').textContent = fmtSens(netAtMilkPrice(mp));
-    });
-  }
-
   function collectState() {
     const numbers = {};
     document.querySelectorAll('input[type=number]').forEach(el => { if (el.id) numbers[el.id] = el.value; });
@@ -1622,7 +1574,6 @@
           '<div class="pr-row"><span>Halter investment</span><b data-cost></b></div>' +
           '<div class="pr-row pr-net"><span>Net annual value</span><b data-net2></b></div>' +
           '<div class="pr-stats"><div><span>Per cow</span><b data-cow></b></div><div><span>Per ha</span><b data-ha></b></div><div><span>Return</span><b data-roi></b></div></div>' +
-          '<h2>Net profit at different milk prices</h2><div class="pr-sens" data-sens></div>' +
           '<h2>Where the value comes from</h2><div class="pr-breakdown" data-breakdown></div>' +
           '<h2>Deployment cost (one-off)</h2><div class="pr-breakdown" data-deploy></div>' +
           '<div class="pr-row pr-net"><span>Total deployment cost</span><b data-deploytotal></b></div>' +
@@ -1646,17 +1597,6 @@
     rep.querySelector('[data-cow]').textContent = get('stat-cow');
     rep.querySelector('[data-ha]').textContent = get('stat-ha');
     rep.querySelector('[data-roi]').textContent = get('stat-roi');
-
-    const sensEl = rep.querySelector('[data-sens]');
-    if (sensEl) {
-      const cur = v('milkprice'), prices = priceRange();
-      sensEl.innerHTML = prices.map(mp => '<div class="pr-scell' + (Math.abs(mp - cur) < 0.005 ? ' cur' : '') + '"><span></span><b></b></div>').join('');
-      const cells = sensEl.querySelectorAll('.pr-scell');
-      prices.forEach((mp, i) => {
-        cells[i].querySelector('span').textContent = '$' + (Math.round(mp * 100) / 100);
-        cells[i].querySelector('b').textContent = fmtBig(netAtMilkPrice(mp));
-      });
-    }
 
     const bd = rep.querySelector('[data-breakdown]');
     DRIVERS.forEach(k => {
