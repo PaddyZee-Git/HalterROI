@@ -872,6 +872,30 @@
 
         </div>
       </div>
+
+      <div class="sec">
+        <div class="sec-head">
+          <span class="sec-num">4</span>
+          <h2>Assumptions</h2>
+          <span class="sec-rule"></span>
+          <button type="button" id="assump-toggle" class="btn-pkg-info" aria-expanded="false" aria-controls="assump-body">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+            Edit
+            <svg class="chev-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+        </div>
+        <div id="assump-body" hidden>
+          <div class="fields">
+            <div class="field"><div class="field-top"><label for="a_6wicr">6-week in-calf value</label><span class="pill"><input type="number" id="a_6wicr" value="4" min="0" max="50" step="0.5"><span class="unit">$/cow/%</span></span></div></div>
+            <div class="field"><div class="field-top"><label for="a_nicr">Not-in-calf value</label><span class="pill"><input type="number" id="a_nicr" value="10" min="0" max="50" step="0.5"><span class="unit">$/cow/%</span></span></div></div>
+            <div class="field"><div class="field-top"><label for="a_mjme_kgms">MJME per kgMS</label><span class="pill"><input type="number" id="a_mjme_kgms" value="80" min="40" max="120" step="1"><span class="unit">MJME</span></span></div></div>
+            <div class="field"><div class="field-top"><label for="a_pasture_profit">Pasture direct profit</label><span class="pill"><input type="number" id="a_pasture_profit" value="350" min="0" max="1000" step="10"><span class="unit">$/tDM</span></span></div></div>
+            <div class="field"><div class="field-top"><label for="a_winter_grow">Winter crop — grow</label><span class="pill"><input type="number" id="a_winter_grow" value="0.20" min="0" max="2" step="0.01"><span class="unit">$/kgDM</span></span></div></div>
+            <div class="field"><div class="field-top"><label for="a_winter_buy">Winter crop — buy</label><span class="pill"><input type="number" id="a_winter_buy" value="0.35" min="0" max="2" step="0.01"><span class="unit">$/kgDM</span></span></div></div>
+          </div>
+          <div class="note">Defaults follow published DairyNZ benchmarks. Adjust for the specific farm or region — changes flow through the calculations and the working lines.</div>
+        </div>
+      </div>
     </div>
 
     <!-- ============ RESULTS ============ -->
@@ -955,6 +979,7 @@
     return sign + '$' + abs.toLocaleString('en-NZ');
   };
   const v = id => parseFloat(document.getElementById(id).value) || 0;
+  const A = (id, d) => { const el = document.getElementById(id); return (el && el.value !== '') ? parseFloat(el.value) : d; };
   const getFCE = () => parseFloat(document.querySelector('input[name="fce"]:checked').value);
   const getLameCost = () => parseFloat(document.querySelector('input[name="lamecost"]:checked').value);
 
@@ -1010,7 +1035,7 @@
     if (use === 'supplement') return total / 1000 * v('supp_cost');
     if (use === 'kgms')       return (total / getFCE()) * mp;
     if (use === 'stocking')   return (total / v('dm_per_cow')) * v('kgms_cow') * mp;
-    if (use === 'profit')     return extra * 350 * ha / 1000;
+    if (use === 'profit')     return extra * A('a_pasture_profit', 350) * ha / 1000;
     return 0;
   }
   function calcQuality() {
@@ -1019,13 +1044,13 @@
     const totalMJME = v('dm_current') * ha * v('mjme_gain');
     const use = document.getElementById('quality_use').value;
     if (use === 'pasture') return (totalMJME / v('mjme_current') / getFCE()) * mp;
-    if (use === 'milk')    return (totalMJME / 80) * mp;
+    if (use === 'milk')    return (totalMJME / A('a_mjme_kgms', 80)) * mp;
     return 0;
   }
   function calcRepro() {
     if (!state.repro) return 0;
     const cows = v('cows'), mp = v('milkprice');
-    let val = v('sixwicr') * 4 * cows + v('nicr') * 10 * cows;
+    let val = v('sixwicr') * A('a_6wicr', 4) * cows + v('nicr') * A('a_nicr', 10) * cows;
     if (document.getElementById('sgl_enable').value === 'yes')
       val += cows * (v('sgl_pct') / 100) * 10 * 1.5 * mp + v('bull_save');
     return val;
@@ -1041,7 +1066,7 @@
   function calcWinter() {
     if (!state.winter) return 0;
     const extra = v('cows') * v('winter_days') * v('winter_feed') * (v('winter_util') / 100);
-    return extra * (document.getElementById('winter_type').value === 'grow' ? 0.20 : 0.35);
+    return extra * (document.getElementById('winter_type').value === 'grow' ? A('a_winter_grow', 0.20) : A('a_winter_buy', 0.35));
   }
 
   function calculate() {
@@ -1230,6 +1255,16 @@
       btn.setAttribute('aria-expanded', opening ? 'true' : 'false');
     });
   })();
+  (function wireAssumptions() {
+    const btn = document.getElementById('assump-toggle');
+    const body = document.getElementById('assump-body');
+    if (btn && body) btn.addEventListener('click', () => {
+      const opening = body.hasAttribute('hidden');
+      if (opening) body.removeAttribute('hidden'); else body.setAttribute('hidden', '');
+      btn.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    });
+    document.querySelectorAll('#assump-body input[type=number]').forEach(el => el.addEventListener('input', calculate));
+  })();
 
   const fmtShort = n => { const a = Math.round(n); return Math.abs(a) >= 1e6 ? '$' + (a / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M' : '$' + a.toLocaleString('en-NZ'); };
   function updateHerd() {
@@ -1248,17 +1283,20 @@
       if (use === 'supplement') { const sc = v('supp_cost'); return base + ' = ' + nz(total / 1000) + ' tDM × $' + nz(sc) + '/tDM = ' + fmt(total / 1000 * sc); }
       if (use === 'kgms') { const fce = getFCE(); return base + ' ÷ ' + fce + ' kgDM/kgMS = ' + nz(total / fce) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(total / fce * mp); }
       if (use === 'stocking') { const kc = v('kgms_cow'), dmc = v('dm_per_cow'); return base + ' ÷ ' + nz(dmc) + ' kgDM/cow = ' + nz(total / dmc) + ' cows × ' + nz(kc) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(total / dmc * kc * mp); }
-      return base + ' = ' + nz(total / 1000) + ' tDM × $350/tDM = ' + fmt(extra * 350 * ha / 1000);
+      const pp = A('a_pasture_profit', 350);
+      return base + ' = ' + nz(total / 1000) + ' tDM × $' + nz(pp) + '/tDM = ' + fmt(extra * pp * ha / 1000);
     }
     if (k === 'quality') {
       const totalMJME = v('dm_current') * ha * v('mjme_gain'), use = document.getElementById('quality_use').value;
       const base = nz(v('dm_current')) + ' kgDM/ha × ' + nz(ha) + ' ha × ' + v('mjme_gain') + ' MJME = ' + nz(totalMJME) + ' MJME';
       if (use === 'pasture') { const fce = getFCE(); return base + ' ÷ ' + v('mjme_current') + ' MJME/kgDM ÷ ' + fce + ' = ' + nz(totalMJME / v('mjme_current') / fce) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(totalMJME / v('mjme_current') / fce * mp); }
-      return base + ' ÷ 80 MJME/kgMS = ' + nz(totalMJME / 80) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(totalMJME / 80 * mp);
+      const mk = A('a_mjme_kgms', 80);
+      return base + ' ÷ ' + mk + ' MJME/kgMS = ' + nz(totalMJME / mk) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(totalMJME / mk * mp);
     }
     if (k === 'repro') {
-      const a = v('sixwicr') * 4 * cows, b = v('nicr') * 10 * cows;
-      let s = '6WICR: ' + v('sixwicr') + ' × $4 × ' + nz(cows) + ' = ' + fmt(a) + ' · NICR: ' + v('nicr') + ' × $10 × ' + nz(cows) + ' = ' + fmt(b);
+      const w6 = A('a_6wicr', 4), wn = A('a_nicr', 10);
+      const a = v('sixwicr') * w6 * cows, b = v('nicr') * wn * cows;
+      let s = '6WICR: ' + v('sixwicr') + ' × $' + w6 + ' × ' + nz(cows) + ' = ' + fmt(a) + ' · NICR: ' + v('nicr') + ' × $' + wn + ' × ' + nz(cows) + ' = ' + fmt(b);
       let tot = a + b;
       if (document.getElementById('sgl_enable').value === 'yes') {
         const sgl = cows * (v('sgl_pct') / 100) * 10 * 1.5 * mp, bull = v('bull_save');
@@ -1276,7 +1314,7 @@
     }
     if (k === 'winter') {
       const extra = cows * v('winter_days') * v('winter_feed') * (v('winter_util') / 100);
-      const rate = document.getElementById('winter_type').value === 'grow' ? 0.20 : 0.35;
+      const rate = document.getElementById('winter_type').value === 'grow' ? A('a_winter_grow', 0.20) : A('a_winter_buy', 0.35);
       return nz(cows) + ' cows × ' + v('winter_days') + ' days × ' + v('winter_feed') + ' kgDM × ' + v('winter_util') + '% = ' + nz(extra) + ' kgDM × $' + rate.toFixed(2) + '/kgDM = ' + fmt(extra * rate);
     }
     if (k === 'vehicles') {

@@ -62,6 +62,15 @@ Maintenance and Repairs** costs. The fleet's total yearly cost × an editable
 profit. The working line shows the fleet cost per year and per month. Vehicles
 persist in saved meetings and auto-resume.
 
+## Assumptions panel
+
+A collapsible "Assumptions" section exposes the benchmark constants used by the
+drivers so they can be adjusted per farm/region: 6-week in-calf value ($/cow per
+1%), not-in-calf value ($/cow per 1%), MJME per kgMS, pasture direct profit
+($/tDM), and winter-crop grow/buy rates ($/kgDM). Changes flow through the
+calculations and the "how this is calculated" working lines, and persist in
+saved meetings.
+
 ## Milk-price sensitivity
 
 The results panel shows a "Net profit at different milk prices" strip — net at
