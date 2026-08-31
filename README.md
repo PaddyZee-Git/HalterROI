@@ -77,6 +77,12 @@ These sum to a **Total deployment cost** shown in the results. Deployment is a
 one-off setup cost, so it is reported separately and does **not** reduce the
 annual net value (which stays a clean per-year figure).
 
+## New meeting
+
+A "New meeting" button in the meeting bar resets every section back to defaults —
+like a fresh document — after a confirm. It clears the current working state and
+reloads; saved meetings are kept.
+
 ## Auto-resume
 
 The app remembers your current working state on the device and restores it when
