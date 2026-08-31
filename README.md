@@ -62,7 +62,7 @@ Maintenance and Repairs** costs. The fleet's total yearly cost × an editable
 profit. The working line shows the fleet cost per year and per month. Vehicles
 persist in saved meetings and auto-resume.
 
-## Additional considerations
+## Other
 
 A switchable value driver (under Vehicles & maintenance) for anything unique to
 a farm that the standard drivers don't cover. Add **items** — each with a
