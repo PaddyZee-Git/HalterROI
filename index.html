@@ -389,7 +389,9 @@
   .pill .unit { font-size: 13px; }
   #meeting_name { height: 52px; font-size: 17px; }
 
-  .notes-field { padding-bottom: 22px; margin-bottom: 26px; border-bottom: 1px solid var(--halter-mist); }
+  .meeting-foot { margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--halter-mist); }
+  .foot-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .notes-field { margin-bottom: 16px; }
   .notes-field label { display: block; font-size: 14px; font-weight: 500; color: var(--halter-ink); margin-bottom: 9px; }
   #meeting_notes { width: 100%; min-height: 76px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); background: var(--halter-white); padding: 12px 14px; font: inherit; font-size: 16px; line-height: 1.5; color: var(--halter-ink); outline: none; resize: vertical; transition: border-color .15s var(--ease); }
   #meeting_notes:focus { border-color: var(--halter-cactus); }
@@ -451,18 +453,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
           Save meeting
         </button>
-        <button type="button" id="print-meeting" class="btn-print">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
-          Print / PDF
-        </button>
         <button type="button" id="new-meeting" class="btn-print">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
           New meeting
         </button>
-      </div>
-      <div class="notes-field">
-        <label for="meeting_notes">Notes</label>
-        <textarea id="meeting_notes" rows="3" placeholder="Notes for this meeting — context, follow-ups, caveats…"></textarea>
       </div>
 
       <!-- Section 1 — Farm -->
@@ -895,6 +889,23 @@
             <div class="field"><div class="field-top"><label for="a_winter_buy">Winter crop — buy</label><span class="pill"><input type="number" id="a_winter_buy" value="0.35" min="0" max="2" step="0.01"><span class="unit">$/kgDM</span></span></div></div>
           </div>
           <div class="note">Defaults follow published DairyNZ benchmarks. Adjust for the specific farm or region — changes flow through the calculations and the working lines.</div>
+        </div>
+      </div>
+
+      <div class="meeting-foot">
+        <div class="notes-field">
+          <label for="meeting_notes">Notes</label>
+          <textarea id="meeting_notes" rows="3" placeholder="Notes for this meeting — context, follow-ups, caveats…"></textarea>
+        </div>
+        <div class="foot-actions">
+          <button type="button" id="print-meeting" class="btn-print">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+            Print / PDF
+          </button>
+          <button type="button" id="save-meeting-2" class="btn-save">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
+            Save meeting
+          </button>
         </div>
       </div>
     </div>
@@ -1680,6 +1691,7 @@
   function printReport(whenIso) { buildReport(whenIso); window.print(); }
 
   document.getElementById('save-meeting').addEventListener('click', saveMeeting);
+  document.getElementById('save-meeting-2').addEventListener('click', saveMeeting);
   document.getElementById('print-meeting').addEventListener('click', () => printReport());
   document.getElementById('new-meeting').addEventListener('click', () => {
     if (confirm('Start a new meeting? This clears the current calculation. Saved meetings are kept.')) {
