@@ -62,6 +62,12 @@ Maintenance and Repairs** costs. The fleet's total yearly cost × an editable
 profit. The working line shows the fleet cost per year and per month. Vehicles
 persist in saved meetings and auto-resume.
 
+## Milk-price sensitivity
+
+The results panel shows a "Net profit at different milk prices" strip — net at
+the current milk price ±$2 (five columns, current highlighted) — so the ROI can
+be shown holding up across a milk-price swing. It also appears in the report.
+
 ## Deployment cost
 
 A "Deployment cost" section (after the value drivers) estimates the one-off cost
