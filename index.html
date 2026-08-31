@@ -783,17 +783,11 @@
               <div id="veh-list" class="veh-list"></div>
               <button type="button" id="veh-add" class="btn-add-veh">+ Add vehicle</button>
               <div class="fields">
-                <div class="field">
-                  <div class="field-top"><label for="veh_days">Days used per year</label>
-                    <span class="pill"><input type="number" id="veh_days" value="300" min="1" max="365" step="5"><span class="unit">days</span></span></div>
-                  <input type="range" class="rng" data-for="veh_days" min="1" max="365" step="5" value="300">
-                  <div class="hint">Used with each vehicle's hours/day and $/hr.</div>
-                </div>
-                <div class="field">
+                <div class="field col-2">
                   <div class="field-top"><label for="veh_reduction">Halter reduces vehicle costs by</label>
                     <span class="pill"><input type="number" id="veh_reduction" value="25" min="0" max="100" step="5"><span class="unit">%</span></span></div>
                   <input type="range" class="rng" data-for="veh_reduction" min="0" max="100" step="5" value="25">
-                  <div class="hint">Applied to the total yearly fleet cost above.</div>
+                  <div class="hint">Applied to the total yearly fleet cost above to give the annual saving.</div>
                 </div>
               </div>
               <div class="calc-note" data-calc="vehicles"></div>
@@ -1093,7 +1087,6 @@
     if (typeof updatePastureLink === 'function') updatePastureLink();
     if (typeof updateHerd === 'function') updateHerd();
     if (typeof updateWorkings === 'function') updateWorkings();
-    if (typeof updateVehSubs === 'function') updateVehSubs();
     if (typeof autoSave === 'function') autoSave();
   }
 
@@ -1285,33 +1278,27 @@
 
   state.vehicles = false;
   const VEH_TYPES = [
-    { k: 'quad', name: 'Quad / 4-wheeler', hoursDay: 3, ratePerHr: 3, fuel: 1200, maint: 600, repairs: 500 },
-    { k: 'bike', name: 'Farm bike', hoursDay: 2, ratePerHr: 2.5, fuel: 900, maint: 450, repairs: 400 },
-    { k: 'sxs', name: 'Side-by-side', hoursDay: 4, ratePerHr: 4, fuel: 1800, maint: 900, repairs: 800 },
-    { k: 'other', name: 'Other', hoursDay: 0, ratePerHr: 0, fuel: 0, maint: 0, repairs: 0 }
+    { k: 'quad', name: 'Quad / 4-wheeler', cost: 2000, fuel: 1200, maint: 600, repairs: 500 },
+    { k: 'bike', name: 'Farm bike', cost: 1500, fuel: 900, maint: 450, repairs: 400 },
+    { k: 'sxs', name: 'Side-by-side', cost: 4000, fuel: 1800, maint: 900, repairs: 800 },
+    { k: 'other', name: 'Other', cost: 0, fuel: 0, maint: 0, repairs: 0 }
   ];
   let vehicles = [
-    { type: 'quad', count: 2, hoursDay: 3, ratePerHr: 3, fuel: 1200, maint: 600, repairs: 500 },
-    { type: 'sxs', count: 1, hoursDay: 4, ratePerHr: 4, fuel: 1800, maint: 900, repairs: 800 }
+    { type: 'quad', count: 2, cost: 2000, fuel: 1200, maint: 600, repairs: 500 },
+    { type: 'sxs', count: 1, cost: 4000, fuel: 1800, maint: 900, repairs: 800 }
   ];
-  function applyVehPreset(row) { const t = VEH_TYPES.find(x => x.k === row.type) || VEH_TYPES[0]; row.hoursDay = t.hoursDay; row.ratePerHr = t.ratePerHr; row.fuel = t.fuel; row.maint = t.maint; row.repairs = t.repairs; }
-  function vehAnnualEach(r) {
-    const days = v('veh_days');
-    const veh = (Number(r.hoursDay) || 0) * days * (Number(r.ratePerHr) || 0);
-    const running = (Number(r.fuel) || 0) + (Number(r.maint) || 0) + (Number(r.repairs) || 0);
-    return { veh: veh, running: running, each: veh + running };
-  }
-  function fleetAnnual() { return vehicles.reduce((a, r) => a + (Number(r.count) || 0) * vehAnnualEach(r).each, 0); }
+  function applyVehPreset(row) { const t = VEH_TYPES.find(x => x.k === row.type) || VEH_TYPES[0]; row.cost = t.cost; row.fuel = t.fuel; row.maint = t.maint; row.repairs = t.repairs; }
+  function fleetAnnual() { return vehicles.reduce((a, r) => a + (Number(r.count) || 0) * ((Number(r.cost) || 0) + (Number(r.fuel) || 0) + (Number(r.maint) || 0) + (Number(r.repairs) || 0)), 0); }
   function calcVehicles() { if (!state.vehicles) return 0; return fleetAnnual() * (v('veh_reduction') / 100); }
-  function vehCostField(i, f, label, val, unit, step, max) {
-    return '<div class="veh-cost"><label>' + label + '</label><span class="pill"><input type="number" class="veh-f" data-i="' + i + '" data-f="' + f + '" value="' + val + '" min="0" max="' + (max || 200000) + '" step="' + (step || 50) + '"><span class="unit">' + (unit || '$/yr') + '</span></span></div>';
+  function vehCostField(i, f, label, val) {
+    return '<div class="veh-cost"><label>' + label + '</label><span class="pill"><input type="number" class="veh-f" data-i="' + i + '" data-f="' + f + '" value="' + val + '" min="0" max="200000" step="50"><span class="unit">$/yr</span></span></div>';
   }
   function updateVehSubs() {
     vehicles.forEach((r, i) => {
       const el = document.querySelector('[data-sub="' + i + '"]');
       if (!el) return;
-      const a = vehAnnualEach(r), n = (Number(r.count) || 0);
-      el.textContent = fmt(a.veh) + ' vehicle + ' + fmt(a.running) + ' running = ' + fmt(a.each) + '/yr each · ' + fmt(a.each * n) + '/yr for ' + n;
+      const each = (Number(r.cost) || 0) + (Number(r.fuel) || 0) + (Number(r.maint) || 0) + (Number(r.repairs) || 0);
+      el.textContent = fmt(each) + '/yr each · ' + fmt(each * (Number(r.count) || 0)) + '/yr for ' + (Number(r.count) || 0);
     });
   }
   function renderVehicles() {
@@ -1325,8 +1312,7 @@
           '<button type="button" class="veh-del" data-i="' + i + '" aria-label="Remove vehicle">×</button>' +
         '</div>' +
         '<div class="veh-costs">' +
-          vehCostField(i, 'hoursDay', 'Hours of use / day', r.hoursDay, 'hrs', 0.5, 24) +
-          vehCostField(i, 'ratePerHr', '$ per hour', r.ratePerHr, '$/hr', 0.5, 1000) +
+          vehCostField(i, 'cost', 'Vehicle', r.cost) +
           vehCostField(i, 'fuel', 'Fuel', r.fuel) +
           vehCostField(i, 'maint', 'Maintenance', r.maint) +
           vehCostField(i, 'repairs', 'Repairs', r.repairs) +

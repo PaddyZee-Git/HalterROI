@@ -56,10 +56,8 @@ field stays editable for a custom quote (flagged as "custom price" in the hint).
 
 A value driver estimating the saving from reduced reliance on farm vehicles.
 Add vehicles as line items — type (Quad / 4-wheeler, Farm bike, Side-by-side,
-Other, which pre-fill typical figures), a count, and per vehicle: **Hours of
-use/day** and **$ per hour** (the vehicle running cost = hours/day × days/year ×
-$/hr), plus yearly **Fuel, Maintenance and Repairs**. A shared **Days used per
-year** applies to all vehicles. The fleet's total yearly cost × an editable
+Other, which pre-fill typical figures), a count, and yearly **Vehicle, Fuel,
+Maintenance and Repairs** costs. The fleet's total yearly cost × an editable
 "Halter reduces vehicle costs by %" gives the annual saving, which feeds the
 profit. The working line shows the fleet cost per year and per month. Vehicles
 persist in saved meetings and auto-resume.
