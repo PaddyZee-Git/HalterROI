@@ -1787,7 +1787,7 @@
         const type = r.type || 'quad';
         const t = vehType(type);
         let dep, fuel, maint;
-        if (r.dep != null || r.fuel != null || r.maint != null) {
+        if (r.dep != null) {
           dep = Number(r.dep) || 0; fuel = Number(r.fuel) || 0; maint = Number(r.maint) || 0;
         } else if (r.rate != null) {
           const presetTotal = t.dep + t.fuel + t.maint, rate = Number(r.rate) || 0;
@@ -1796,6 +1796,7 @@
         } else {
           dep = t.dep; fuel = t.fuel; maint = t.maint;
         }
+        if (dep + fuel + maint > 200) { dep = t.dep; fuel = t.fuel; maint = t.maint; }
         return { type, count: r.count != null ? r.count : 1, hours: r.hours != null ? r.hours : 2, dep, fuel, maint };
       });
       renderVehicles();
