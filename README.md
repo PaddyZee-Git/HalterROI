@@ -58,9 +58,12 @@ A value driver estimating the saving from reduced reliance on farm vehicles.
 Add vehicles as line items — **type** (Side-by-side, Quad / ATV, Motorbike,
 Other), a **count**, the **hours of use per day**, and a **running cost
 ($/hr)**. Each vehicle's yearly cost is `hours/day × 365 × $/hr × count`, and
-the running cost bundles depreciation, fuel and maintenance in one editable
-figure, pre-filled per type (Side-by-side ≈ $16/hr, Quad ≈ $8/hr, Motorbike ≈
-$4/hr — indicative Australian benchmarks, adjustable per farm). The fleet's
+the running cost bundles depreciation, fuel and maintenance, pre-filled per
+type (Side-by-side ≈ $16/hr, Quad ≈ $8/hr, Motorbike ≈ $4/hr — indicative
+Australian benchmarks). Tap a vehicle's **Running cost** to open a popup that
+breaks the $/hr into **depreciation**, **fuel** and **maintenance & repairs**;
+edit any line and the total flows straight back into the calculation, or reset
+it to the type default. The fleet's
 total yearly cost × an editable "Halter reduces vehicle costs by %" gives the
 annual saving, which feeds the profit. Each row shows its own working, and the
 driver's working line shows the fleet cost per year and per month. Vehicles

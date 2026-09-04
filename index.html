@@ -413,6 +413,31 @@
   .btn-add-veh { margin-top: 12px; height: 44px; padding: 0 18px; border: 1px dashed var(--halter-mist); border-radius: var(--radius-sm); background: var(--halter-white); color: var(--halter-green); font-weight: 600; font-size: 14px; cursor: pointer; }
   .btn-add-veh:hover { border-color: var(--halter-cactus); }
   @media (max-width: 560px) { .veh-costs { grid-template-columns: 1fr; } }
+  .veh-rate-btn { width: 100%; display: inline-flex; align-items: center; justify-content: flex-end; gap: 6px; background: var(--halter-platinum); border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); padding: 4px 10px; min-height: 40px; cursor: pointer; font-family: var(--mono); }
+  .veh-rate-btn:hover { border-color: var(--halter-cactus); }
+  .veh-rate-val { font-size: 17px; font-weight: 600; color: var(--halter-ink); }
+  .veh-rate-btn .unit { color: var(--halter-graphite); font-size: 13px; }
+  .veh-rate-caret { width: 16px; height: 16px; color: var(--halter-graphite); flex: none; margin-left: 2px; }
+
+  .veh-modal-overlay { position: fixed; inset: 0; background: rgba(26,42,34,0.45); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; }
+  .veh-modal-overlay[hidden] { display: none; }
+  .veh-modal { width: 100%; max-width: 440px; background: var(--halter-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); padding: 22px; max-height: 90vh; overflow-y: auto; }
+  .veh-modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .veh-modal-head h4 { font-size: 20px; font-weight: 600; color: var(--halter-green); }
+  .veh-modal-x { flex: none; width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--halter-mist); background: var(--halter-white); color: var(--halter-graphite); font-size: 22px; line-height: 1; cursor: pointer; }
+  .veh-modal-x:hover { border-color: var(--halter-danger); color: var(--halter-danger); }
+  .veh-modal-sub { margin-top: 6px; font-size: 13px; line-height: 1.5; color: var(--halter-graphite); }
+  .veh-modal-body { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .veh-mrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .veh-mrow label { font-size: 15px; color: var(--halter-ink); }
+  .veh-mrow .pill { min-width: 120px; padding: 8px 12px; }
+  .veh-mrow .pill input { width: 72px; font-size: 17px; }
+  .veh-modal-total { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--halter-mist); display: flex; align-items: center; justify-content: space-between; }
+  .veh-modal-total span { font-size: 15px; color: var(--halter-graphite); }
+  .veh-modal-total strong { font-size: 22px; font-weight: 600; color: var(--halter-green); font-variant-numeric: tabular-nums; }
+  .veh-modal-foot { margin-top: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .veh-modal-reset { border: 0; background: none; color: var(--halter-cactus); font-size: 14px; font-weight: 500; cursor: pointer; padding: 8px 0; text-decoration: underline; }
+  .veh-modal-done { height: 48px; padding: 0 26px; border: 0; border-radius: var(--radius-sm); background: var(--halter-green); color: #fff; font-weight: 600; font-size: 16px; cursor: pointer; }
 
   .extra-row { border: 1px solid var(--halter-mist); border-radius: var(--radius-md); padding: 14px; background: var(--halter-white); }
   .extra-row + .extra-row { margin-top: 12px; }
@@ -816,10 +841,30 @@
                   <div class="field-top"><label for="veh_reduction">Halter reduces vehicle costs by</label>
                     <span class="pill"><input type="number" id="veh_reduction" value="25" min="0" max="100" step="5"><span class="unit">%</span></span></div>
                   <input type="range" class="rng" data-for="veh_reduction" min="0" max="100" step="5" value="25">
-                  <div class="hint">Each vehicle's yearly cost = hours/day × 365 × $/hr. The running cost ($/hr) bundles depreciation, fuel and maintenance — pre-filled per type, editable. This % is applied to the fleet's total yearly cost to give the annual saving.</div>
+                  <div class="hint">Each vehicle's yearly cost = hours/day × 365 × $/hr. Tap a vehicle's <strong>Running cost</strong> to see and edit the depreciation, fuel and maintenance behind the $/hr. This % is applied to the fleet's total yearly cost to give the annual saving.</div>
                 </div>
               </div>
               <div class="calc-note" data-calc="vehicles"></div>
+            </div>
+          </div>
+
+          <div class="veh-modal-overlay" id="veh-modal" hidden>
+            <div class="veh-modal" role="dialog" aria-modal="true" aria-labelledby="veh-modal-title">
+              <div class="veh-modal-head">
+                <h4 id="veh-modal-title">Running cost</h4>
+                <button type="button" class="veh-modal-x" id="veh-modal-close" aria-label="Close">×</button>
+              </div>
+              <p class="veh-modal-sub">The assumed $/hr behind this vehicle. Edit any line — the total is what the calculation uses. Indicative Australian figures.</p>
+              <div class="veh-modal-body">
+                <div class="veh-mrow"><label for="vm_dep">Depreciation</label><span class="pill"><input type="number" id="vm_dep" min="0" max="1000" step="0.25"><span class="unit">$/hr</span></span></div>
+                <div class="veh-mrow"><label for="vm_fuel">Fuel</label><span class="pill"><input type="number" id="vm_fuel" min="0" max="1000" step="0.25"><span class="unit">$/hr</span></span></div>
+                <div class="veh-mrow"><label for="vm_maint">Maintenance &amp; repairs</label><span class="pill"><input type="number" id="vm_maint" min="0" max="1000" step="0.25"><span class="unit">$/hr</span></span></div>
+              </div>
+              <div class="veh-modal-total"><span>Total running cost</span><strong id="vm_total">$0/hr</strong></div>
+              <div class="veh-modal-foot">
+                <button type="button" class="veh-modal-reset" id="veh-modal-reset">Reset to type default</button>
+                <button type="button" class="veh-modal-done" id="veh-modal-done">Done</button>
+              </div>
             </div>
           </div>
 
@@ -1406,30 +1451,30 @@
   state.vehicles = false;
   const VEH_DAYS = 365;
   const VEH_TYPES = [
-    { k: 'sxs', name: 'Side-by-side', rate: 16 },
-    { k: 'quad', name: 'Quad / ATV', rate: 8 },
-    { k: 'bike', name: 'Motorbike', rate: 4 },
-    { k: 'other', name: 'Other', rate: 0 }
+    { k: 'sxs', name: 'Side-by-side', dep: 6, fuel: 7, maint: 3 },
+    { k: 'quad', name: 'Quad / ATV', dep: 2.5, fuel: 4, maint: 1.5 },
+    { k: 'bike', name: 'Motorbike', dep: 1.25, fuel: 2, maint: 0.75 },
+    { k: 'other', name: 'Other', dep: 0, fuel: 0, maint: 0 }
   ];
   let vehicles = [
-    { type: 'quad', count: 2, hours: 3, rate: 8 },
-    { type: 'sxs', count: 1, hours: 2, rate: 16 }
+    { type: 'quad', count: 2, hours: 3, dep: 2.5, fuel: 4, maint: 1.5 },
+    { type: 'sxs', count: 1, hours: 2, dep: 6, fuel: 7, maint: 3 }
   ];
-  function vehRate(type) { const t = VEH_TYPES.find(x => x.k === type); return t ? t.rate : 0; }
-  function applyVehPreset(row) { row.rate = vehRate(row.type); }
-  function vehAnnual(r) { return (Number(r.count) || 0) * (Number(r.hours) || 0) * VEH_DAYS * (Number(r.rate) || 0); }
+  let vehEditIndex = null;
+  function vehType(type) { return VEH_TYPES.find(x => x.k === type) || VEH_TYPES[VEH_TYPES.length - 1]; }
+  function vehRowRate(r) { return (Number(r.dep) || 0) + (Number(r.fuel) || 0) + (Number(r.maint) || 0); }
+  function fmtRate(n) { const r = Math.round((Number(n) || 0) * 100) / 100; return '$' + (Number.isInteger(r) ? r : r.toFixed(2)); }
+  function applyVehPreset(row) { const t = vehType(row.type); row.dep = t.dep; row.fuel = t.fuel; row.maint = t.maint; }
+  function vehAnnual(r) { return (Number(r.count) || 0) * (Number(r.hours) || 0) * VEH_DAYS * vehRowRate(r); }
   function fleetAnnual() { return vehicles.reduce((a, r) => a + vehAnnual(r), 0); }
   function calcVehicles() { if (!state.vehicles) return 0; return fleetAnnual() * (v('veh_reduction') / 100); }
-  function vehField(i, f, label, val, unit, step, max) {
-    return '<div class="veh-cost"><label>' + label + '</label><span class="pill"><input type="number" class="veh-f" data-i="' + i + '" data-f="' + f + '" value="' + val + '" min="0" max="' + max + '" step="' + step + '"><span class="unit">' + unit + '</span></span></div>';
-  }
   function updateVehSubs() {
     vehicles.forEach((r, i) => {
       const el = document.querySelector('[data-sub="' + i + '"]');
       if (!el) return;
-      const hrs = Number(r.hours) || 0, rate = Number(r.rate) || 0, n = Number(r.count) || 0;
+      const hrs = Number(r.hours) || 0, rate = vehRowRate(r), n = Number(r.count) || 0;
       const each = hrs * VEH_DAYS * rate;
-      el.textContent = hrs + ' hrs/day × 365 × $' + rate + '/hr = ' + fmt(each) + '/yr each · ' + fmt(each * n) + '/yr for ' + n;
+      el.textContent = hrs + ' hrs/day × 365 × ' + fmtRate(rate) + '/hr = ' + fmt(each) + '/yr each · ' + fmt(each * n) + '/yr for ' + n;
     });
   }
   function renderVehicles() {
@@ -1443,8 +1488,8 @@
           '<button type="button" class="veh-del" data-i="' + i + '" aria-label="Remove vehicle">×</button>' +
         '</div>' +
         '<div class="veh-costs">' +
-          vehField(i, 'hours', 'Hours of use', r.hours, 'hrs/day', 0.5, 24) +
-          vehField(i, 'rate', 'Running cost', r.rate, '$/hr', 0.5, 1000) +
+          '<div class="veh-cost"><label>Hours of use</label><span class="pill"><input type="number" class="veh-f" data-i="' + i + '" data-f="hours" value="' + r.hours + '" min="0" max="24" step="0.5"><span class="unit">hrs/day</span></span></div>' +
+          '<div class="veh-cost"><label>Running cost</label><button type="button" class="veh-rate-btn" data-i="' + i + '" aria-label="Edit running cost breakdown"><span class="veh-rate-val">' + fmtRate(vehRowRate(r)) + '</span><span class="unit">/hr</span><svg class="veh-rate-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button></div>' +
         '</div>' +
         '<div class="veh-sub" data-sub="' + i + '"></div>' +
       '</div>'
@@ -1457,18 +1502,64 @@
       vehicles[i][f] = e.target.value === '' ? 0 : parseFloat(e.target.value);
       updateVehSubs(); calculate();
     }));
+    list.querySelectorAll('.veh-rate-btn').forEach(btn => btn.addEventListener('click', e => openVehModal(+e.currentTarget.dataset.i)));
     list.querySelectorAll('.veh-del').forEach(btn => btn.addEventListener('click', e => {
       vehicles.splice(+e.currentTarget.dataset.i, 1); renderVehicles(); calculate();
     }));
     updateVehSubs();
   }
+  function refreshVehRow(i) {
+    const el = document.querySelector('.veh-rate-btn[data-i="' + i + '"] .veh-rate-val');
+    if (el) el.textContent = fmtRate(vehRowRate(vehicles[i]));
+    updateVehSubs();
+  }
+  function updateVehModalTotal() {
+    const d = parseFloat(document.getElementById('vm_dep').value) || 0;
+    const f = parseFloat(document.getElementById('vm_fuel').value) || 0;
+    const m = parseFloat(document.getElementById('vm_maint').value) || 0;
+    document.getElementById('vm_total').textContent = fmtRate(d + f + m) + '/hr';
+  }
+  function openVehModal(i) {
+    vehEditIndex = i;
+    const r = vehicles[i];
+    document.getElementById('veh-modal-title').textContent = 'Running cost — ' + vehType(r.type).name;
+    document.getElementById('vm_dep').value = r.dep;
+    document.getElementById('vm_fuel').value = r.fuel;
+    document.getElementById('vm_maint').value = r.maint;
+    updateVehModalTotal();
+    document.getElementById('veh-modal').hidden = false;
+    document.getElementById('vm_dep').focus();
+  }
+  function closeVehModal() { const ov = document.getElementById('veh-modal'); if (ov) ov.hidden = true; vehEditIndex = null; }
   (function () {
     const addBtn = document.getElementById('veh-add');
     if (addBtn) addBtn.addEventListener('click', () => {
       const t = VEH_TYPES[0];
-      vehicles.push({ type: t.k, count: 1, hours: 2, rate: t.rate });
+      vehicles.push({ type: t.k, count: 1, hours: 2, dep: t.dep, fuel: t.fuel, maint: t.maint });
       renderVehicles(); calculate();
     });
+    const fieldMap = { vm_dep: 'dep', vm_fuel: 'fuel', vm_maint: 'maint' };
+    Object.keys(fieldMap).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', e => {
+        if (vehEditIndex == null) return;
+        vehicles[vehEditIndex][fieldMap[id]] = e.target.value === '' ? 0 : parseFloat(e.target.value);
+        updateVehModalTotal(); refreshVehRow(vehEditIndex); calculate();
+      });
+    });
+    const resetBtn = document.getElementById('veh-modal-reset');
+    if (resetBtn) resetBtn.addEventListener('click', () => {
+      if (vehEditIndex == null) return;
+      const r = vehicles[vehEditIndex]; applyVehPreset(r);
+      document.getElementById('vm_dep').value = r.dep;
+      document.getElementById('vm_fuel').value = r.fuel;
+      document.getElementById('vm_maint').value = r.maint;
+      updateVehModalTotal(); refreshVehRow(vehEditIndex); calculate();
+    });
+    ['veh-modal-close', 'veh-modal-done'].forEach(id => { const b = document.getElementById(id); if (b) b.addEventListener('click', closeVehModal); });
+    const overlay = document.getElementById('veh-modal');
+    if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) closeVehModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay && !overlay.hidden) closeVehModal(); });
   })();
   renderVehicles();
 
@@ -1692,12 +1783,21 @@
     const sglOn = document.getElementById('sgl_enable').value === 'yes';
     document.querySelectorAll('[data-sgl]').forEach(el => el.style.display = sglOn ? '' : 'none');
     if (Array.isArray(s.vehicles)) {
-      vehicles = s.vehicles.map(r => ({
-        type: r.type || 'quad',
-        count: r.count != null ? r.count : 1,
-        hours: r.hours != null ? r.hours : 2,
-        rate: r.rate != null ? r.rate : vehRate(r.type || 'quad')
-      }));
+      vehicles = s.vehicles.map(r => {
+        const type = r.type || 'quad';
+        const t = vehType(type);
+        let dep, fuel, maint;
+        if (r.dep != null || r.fuel != null || r.maint != null) {
+          dep = Number(r.dep) || 0; fuel = Number(r.fuel) || 0; maint = Number(r.maint) || 0;
+        } else if (r.rate != null) {
+          const presetTotal = t.dep + t.fuel + t.maint, rate = Number(r.rate) || 0;
+          if (presetTotal > 0) { const f = rate / presetTotal; dep = t.dep * f; fuel = t.fuel * f; maint = t.maint * f; }
+          else { dep = rate; fuel = 0; maint = 0; }
+        } else {
+          dep = t.dep; fuel = t.fuel; maint = t.maint;
+        }
+        return { type, count: r.count != null ? r.count : 1, hours: r.hours != null ? r.hours : 2, dep, fuel, maint };
+      });
       renderVehicles();
     }
     if (Array.isArray(s.extras)) {
