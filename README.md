@@ -55,11 +55,15 @@ field stays editable for a custom quote (flagged as "custom price" in the hint).
 ## Vehicles & maintenance
 
 A value driver estimating the saving from reduced reliance on farm vehicles.
-Add vehicles as line items — type (Quad / 4-wheeler, Farm bike, Side-by-side,
-Other, which pre-fill typical figures), a count, and yearly **Vehicle, Fuel,
-Maintenance and Repairs** costs. The fleet's total yearly cost × an editable
-"Halter reduces vehicle costs by %" gives the annual saving, which feeds the
-profit. The working line shows the fleet cost per year and per month. Vehicles
+Add vehicles as line items — **type** (Side-by-side, Quad / ATV, Motorbike,
+Other), a **count**, the **hours of use per day**, and a **running cost
+($/hr)**. Each vehicle's yearly cost is `hours/day × 365 × $/hr × count`, and
+the running cost bundles depreciation, fuel and maintenance in one editable
+figure, pre-filled per type (Side-by-side ≈ $16/hr, Quad ≈ $8/hr, Motorbike ≈
+$4/hr — indicative Australian benchmarks, adjustable per farm). The fleet's
+total yearly cost × an editable "Halter reduces vehicle costs by %" gives the
+annual saving, which feeds the profit. Each row shows its own working, and the
+driver's working line shows the fleet cost per year and per month. Vehicles
 persist in saved meetings and auto-resume.
 
 ## Other
