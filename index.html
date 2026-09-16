@@ -732,9 +732,9 @@
             <div class="dbody" data-body="lameness">
               <div class="fields">
                 <div class="field">
-                  <div class="field-top"><label for="lameness_pct">Current lameness incidence</label>
-                    <span class="pill"><input type="number" id="lameness_pct" value="15" min="1" max="50" step="1"><span class="unit">%</span></span></div>
-                  <input type="range" class="rng" data-for="lameness_pct" min="1" max="50" step="1" value="15">
+                  <div class="field-top"><label for="lameness_cases">Current lameness cases</label>
+                    <span class="pill"><input type="number" id="lameness_cases" value="60" min="0" max="2000" step="1"><span class="unit">cases/yr</span></span></div>
+                  <input type="range" class="rng" data-for="lameness_cases" min="0" max="500" step="5" value="60">
                 </div>
                 <div class="field">
                   <div class="field-top"><label for="lameness_reduction">Expected reduction</label>
@@ -1161,7 +1161,7 @@
   }
   function calcLameness() {
     if (!state.lameness) return 0;
-    return v('cows') * (v('lameness_pct') / 100) * (v('lameness_reduction') / 100) * getLameCost();
+    return v('lameness_cases') * (v('lameness_reduction') / 100) * getLameCost();
   }
   function calcLabour() {
     if (!state.labour) return 0;
@@ -1416,8 +1416,8 @@
       return s + ' = ' + fmt(tot);
     }
     if (k === 'lameness') {
-      const lc = getLameCost();
-      return nz(cows) + ' cows × ' + v('lameness_pct') + '% × ' + v('lameness_reduction') + '% × $' + nz(lc) + ' = ' + fmt(cows * (v('lameness_pct') / 100) * (v('lameness_reduction') / 100) * lc);
+      const lc = getLameCost(), cases = v('lameness_cases');
+      return nz(cases) + ' cases × ' + v('lameness_reduction') + '% × $' + nz(lc) + ' = ' + fmt(cases * (v('lameness_reduction') / 100) * lc);
     }
     if (k === 'labour') {
       return v('hours_week') + ' hrs/wk × ' + v('weeks') + ' wks × $' + nz(v('labour_rate')) + '/hr = ' + fmt(v('hours_week') * v('weeks') * v('labour_rate'));
