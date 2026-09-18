@@ -2011,7 +2011,15 @@
     });
   }
 
-  function printReport(whenIso) { buildReport(whenIso); window.print(); }
+  function printReport(whenIso) {
+    buildReport(whenIso);
+    const name = (document.getElementById('meeting_name').value || '').trim() || 'Untitled meeting';
+    const prev = document.title;
+    document.title = 'Halter - ' + name + ' ROI';
+    const restore = () => { document.title = prev; window.removeEventListener('afterprint', restore); };
+    window.addEventListener('afterprint', restore);
+    window.print();
+  }
 
   document.getElementById('save-meeting').addEventListener('click', saveMeeting);
   document.getElementById('save-meeting-2').addEventListener('click', saveMeeting);
