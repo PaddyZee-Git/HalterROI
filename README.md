@@ -17,8 +17,8 @@ unaffected. That option also has an editable **Feed per extra cow** field
 only when the stocking-rate option is selected.
 
 Below the field, a read-only **Herd production** caption shows total milk solids
-(Milking cows × kgMS/cow) and approximate milk revenue (× milk price) — baseline
-farm context that does not affect the ROI. It also prints in the report.
+(Milking cows × kgMS/cow) — baseline farm context that does not affect the ROI.
+It also prints in the report.
 
 ## Pasture lift (% ↔ kgDM/ha)
 
