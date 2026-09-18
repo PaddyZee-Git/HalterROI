@@ -351,8 +351,7 @@
   /* ---------- Print report ---------- */
   #print-report { display: none; }
   .pr-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 2px solid var(--halter-green); margin-bottom: 18px; }
-  .pr-wordmark { display: inline-flex; align-items: baseline; gap: 2px; font-weight: 600; font-size: 24px; letter-spacing: -0.03em; color: var(--halter-green); }
-  .pr-wordmark i { width: 7px; height: 7px; border-radius: 50%; background: var(--halter-mantis); display: inline-block; align-self: flex-start; margin-top: 5px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pr-logo { height: 32px; width: auto; display: block; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .pr-tag { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; color: var(--halter-graphite); }
   .pr-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--halter-cactus); font-weight: 600; }
   .pr-title h1 { font-size: 26px; font-weight: 600; color: var(--halter-ink); margin: 3px 0; letter-spacing: -0.02em; }
@@ -1061,7 +1060,7 @@
 <div id="print-report"></div>
 
 <footer>
-  Halter dairy ROI calculator <span class="sep">·</span> For account manager use <span class="sep">·</span> Figures are estimates based on farm inputs and published DairyNZ benchmarks
+  Halter dairy ROI calculator <span class="sep">·</span> For internal use only. Do not share.
 </footer>
 
 <script>
@@ -1901,7 +1900,7 @@
     const when = fmtWhen(whenIso || new Date().toISOString());
     const get = id => document.getElementById(id).textContent;
     rep.innerHTML =
-      '<div class="pr-head"><span class="pr-wordmark">Halter<i></i></span><span class="pr-tag">ROI calculator</span></div>' +
+      '<div class="pr-head"><img class="pr-logo" src="assets/halter-logo.png" alt="Halter"><span class="pr-tag">ROI calculator</span></div>' +
       '<div class="pr-title"><div class="pr-eyebrow">Meeting</div><h1 class="pr-name"></h1><div class="pr-date"></div></div>' +
       '<div class="pr-hero"><div class="pr-hero-k">Estimated annual profit</div><div class="pr-hero-v" data-net></div><div class="pr-hero-sub" data-sub></div></div>' +
       '<div class="pr-cols">' +
@@ -1922,7 +1921,7 @@
         '</div>' +
       '</div>' +
       '<div class="pr-notes" data-notes hidden><h2>Notes</h2><div class="pr-notes-body"></div></div>' +
-      '<div class="pr-foot">Halter dairy ROI calculator · For account manager use · Figures are estimates based on farm inputs and published DairyNZ benchmarks</div>';
+      '<div class="pr-foot">Halter dairy ROI calculator · For internal use only. Do not share.</div>';
 
     rep.querySelector('.pr-name').textContent = name;
     rep.querySelector('.pr-date').textContent = when;
