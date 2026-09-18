@@ -36,13 +36,7 @@
     background: var(--halter-beef);
     position: sticky; top: 0; z-index: 20;
   }
-  .wordmark {
-    display: inline-flex; align-items: baseline; gap: 2px;
-    font-weight: 600; font-size: 26px; letter-spacing: -0.03em;
-    color: var(--halter-green);
-  }
-  .wordmark i { width: 8px; height: 8px; border-radius: 50%; background: var(--halter-lime);
-    display: inline-block; align-self: flex-start; margin-top: 5px; margin-left: 1px; }
+  .topbar-logo { height: 34px; width: auto; display: block; }
   .topbar-tag {
     font-size: var(--type-eyebrow); text-transform: uppercase;
     letter-spacing: var(--track-eyebrow); font-weight: 500;
@@ -473,7 +467,7 @@
 <body>
 
 <header class="topbar">
-  <span class="wordmark">Halter<i></i></span>
+  <img class="topbar-logo" src="assets/halter-logo.png" alt="Halter">
   <span class="topbar-tag">ROI calculator</span>
 </header>
 
