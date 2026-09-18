@@ -1897,11 +1897,10 @@
   function buildReport(whenIso) {
     const rep = document.getElementById('print-report');
     const name = (document.getElementById('meeting_name').value || '').trim() || 'Untitled meeting';
-    const when = fmtWhen(whenIso || new Date().toISOString());
     const get = id => document.getElementById(id).textContent;
     rep.innerHTML =
       '<div class="pr-head"><img class="pr-logo" src="assets/halter-logo.png" alt="Halter"><span class="pr-tag">ROI calculator</span></div>' +
-      '<div class="pr-title"><div class="pr-eyebrow">Meeting</div><h1 class="pr-name"></h1><div class="pr-date"></div></div>' +
+      '<div class="pr-title"><h1 class="pr-name"></h1></div>' +
       '<div class="pr-hero"><div class="pr-hero-k">Estimated annual profit</div><div class="pr-hero-v" data-net></div><div class="pr-hero-sub" data-sub></div></div>' +
       '<div class="pr-cols">' +
         '<div class="pr-col">' +
@@ -1924,7 +1923,6 @@
       '<div class="pr-foot">Halter dairy ROI calculator · For internal use only. Do not share.</div>';
 
     rep.querySelector('.pr-name').textContent = name;
-    rep.querySelector('.pr-date').textContent = when;
     rep.querySelector('[data-net]').textContent = get('grand-total');
     rep.querySelector('[data-sub]').textContent = get('gross-sub');
     rep.querySelector('[data-gross]').textContent = get('led-gross');
