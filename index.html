@@ -344,6 +344,7 @@
 
   /* ---------- Print report ---------- */
   #print-report { display: none; color: var(--halter-ink); font-size: 11px; line-height: 1.34; }
+  #print-report.pr-capture { display: block; position: fixed; left: -10000px; top: 0; width: 794px; padding: 45px; background: #fff; z-index: -1; }
   .pr-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 2px solid var(--halter-green); margin-bottom: 12px; }
   .pr-logo { height: 27px; width: auto; display: block; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .pr-headmeta { text-align: right; }
@@ -351,8 +352,8 @@
   .pr-name { display: block; font-size: 16px; font-weight: 600; color: var(--halter-ink); letter-spacing: -0.01em; margin-top: 1px; }
   .pr-hero { display: flex; align-items: center; justify-content: space-between; gap: 18px; background: var(--halter-green); color: #fff; border-radius: 9px; padding: 12px 20px; margin-bottom: 12px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .pr-hero-k { font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: var(--halter-lime); font-weight: 600; }
-  .pr-hero-v { font-size: 30px; font-weight: 600; letter-spacing: -.02em; margin: 1px 0; font-variant-numeric: tabular-nums; line-height: 1; }
-  .pr-hero-sub { font-size: 10px; color: rgba(255,255,255,.72); }
+  .pr-hero-v { font-size: 30px; font-weight: 600; letter-spacing: 0; margin: 3px 0 4px; line-height: 1.12; }
+  .pr-hero-sub { font-size: 10px; color: rgba(255,255,255,.72); line-height: 1.3; }
   .pr-hero-stats { display: flex; gap: 20px; flex: none; }
   .pr-hero-stats div { text-align: right; }
   .pr-hero-stats span { display: block; font-size: 8.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--halter-lime); font-weight: 600; }
@@ -1118,6 +1119,9 @@
 <footer>
   Halter dairy ROI calculator <span class="sep">·</span> For internal use only. Do not share.
 </footer>
+
+<script src="assets/vendor/html2canvas.min.js"></script>
+<script src="assets/vendor/jspdf.umd.min.js"></script>
 
 <script>
   const DRIVERS = ['pasture','quality','repro','lameness','labour','winter','split','vehicles','extra'];
@@ -2193,7 +2197,7 @@
     });
   }
 
-  function printReport(whenIso) {
+  function printReportNative(whenIso) {
     buildReport(whenIso);
     const name = (document.getElementById('meeting_name').value || '').trim() || 'Untitled meeting';
     const prev = document.title;
@@ -2201,6 +2205,30 @@
     const restore = () => { document.title = prev; window.removeEventListener('afterprint', restore); };
     window.addEventListener('afterprint', restore);
     window.print();
+  }
+
+  async function printReport(whenIso) {
+    const jspdfNS = window.jspdf;
+    if (!window.html2canvas || !jspdfNS || !jspdfNS.jsPDF) { printReportNative(whenIso); return; }
+    buildReport(whenIso);
+    const name = (document.getElementById('meeting_name').value || '').trim() || 'Untitled meeting';
+    const rep = document.getElementById('print-report');
+    rep.classList.add('pr-capture');
+    try {
+      if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+      const canvas = await html2canvas(rep, { scale: 2, backgroundColor: '#ffffff', useCORS: true, windowWidth: rep.scrollWidth, windowHeight: rep.scrollHeight });
+      const jsPDF = jspdfNS.jsPDF;
+      const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+      const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight();
+      let imgW = pw, imgH = canvas.height * (pw / canvas.width), x = 0, y = 0;
+      if (imgH > ph) { imgH = ph; imgW = canvas.width * (ph / canvas.height); x = (pw - imgW) / 2; }
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', x, y, imgW, imgH);
+      pdf.save('Halter - ' + name + ' ROI.pdf');
+    } catch (e) {
+      printReportNative(whenIso);
+    } finally {
+      rep.classList.remove('pr-capture');
+    }
   }
 
   document.getElementById('save-meeting').addEventListener('click', saveMeeting);

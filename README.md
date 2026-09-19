@@ -172,12 +172,16 @@ installed app) they were saved in — they are not synced between devices.
 
 Tap **Print / PDF** (next to Save meeting) to produce a clean, one-page Halter
 report of the current calculation — headline value, results, the value
-breakdown, the farm inputs, and the assumptions behind each active driver. Each
-saved meeting also has its own **Print** button.
+breakdown, the farm inputs, the Cost of Halter, and the working behind each
+active driver. Each saved meeting also has its own **Print** button.
 
-This uses the browser's print dialog, so on an iPad you can **AirPrint** it or
-choose **Save to Files** to export a PDF you can email or file. No calculation
-data ever leaves the device.
+The PDF is generated **inside the app** (with bundled `jspdf` and `html2canvas`,
+served locally so it works offline) and saved as `Halter - <meeting> ROI.pdf`.
+Generating it in-app deliberately avoids the browser's print dialog, so the
+exported PDF carries **no browser header/footer** (no page URL or date stamp) —
+just the Halter report. On an iPad the file opens in the previewer where you can
+**Save to Files** or share it. If the libraries ever fail to load, it falls back
+to the browser print dialog. No calculation data leaves the device.
 
 ## Files
 
@@ -187,6 +191,8 @@ data ever leaves the device.
 | `tokens.css` | Halter design tokens — colours, type scale, spacing, `@font-face`. |
 | `fonts/` | PP Neue Montreal typeface (all weights + italics). |
 | `assets/hero-cattle-collar.jpg` | Hero photo (optimised for retina iPad). |
+| `assets/halter-logo.png` | Halter logo used in the top bar and the report. |
+| `assets/vendor/` | `jspdf` + `html2canvas` (bundled locally) for in-app PDF export. |
 | `icons/` | App + home-screen icons and favicon. |
 | `manifest.webmanifest` | PWA manifest for "Add to Home Screen". |
 | `sw.js` | Service worker — caches the app so it works offline once loaded. |

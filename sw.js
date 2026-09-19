@@ -1,4 +1,4 @@
-const CACHE = 'halter-roi-v56';
+const CACHE = 'halter-roi-v57';
 const CORE = [
   '.',
   'index.html',
@@ -6,6 +6,8 @@ const CORE = [
   'manifest.webmanifest',
   'assets/hero-cattle-collar.jpg',
   'assets/halter-logo.png',
+  'assets/vendor/html2canvas.min.js',
+  'assets/vendor/jspdf.umd.min.js',
   'icons/apple-touch-icon.png',
   'icons/favicon-32.png',
   'icons/icon-192.png',
