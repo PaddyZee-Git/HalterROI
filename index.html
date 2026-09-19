@@ -989,7 +989,7 @@
           <h2>Concessions</h2>
           <span class="sec-rule"></span>
         </div>
-        <div class="note" style="margin-bottom:14px">Discounts you're able to offer on Halter. Each is taken off the annual cost and listed on the report.</div>
+        <div class="note" style="margin-bottom:14px">One-off discounts you're able to offer on Halter. Each is a first-year saving, taken off the first-year cost and listed on the report.</div>
         <div id="conc-list" class="veh-list"></div>
         <button type="button" id="conc-add" class="btn-add-veh">Add concession</button>
       </div>
@@ -1063,8 +1063,11 @@
           <span class="lname">Setup<small>· one-off (towers + freight)</small></span>
           <span class="lamt" id="cost-setup">$0</span>
         </div>
+      </div>
+      <div class="breakdown" id="cost-concessions"></div>
+      <div class="ledger">
         <div class="lrow net">
-          <span class="lname">Total first-year cost</span>
+          <span class="lname">Total first-year cost<small>· after concessions</small></span>
           <span class="lamt" id="cost-total">$0</span>
         </div>
       </div>
@@ -1249,9 +1252,10 @@
     const cows = v('cows'), ha = v('ha'), collar = v('collar');
     const subscription = cows * collar * 12;
     const connectivity = (typeof calcConnectivity === 'function' ? calcConnectivity() : 0);
+    const annualCost = subscription + connectivity;
     const concess = (typeof concTotal === 'function' ? concTotal() : 0);
-    const annualCost = subscription + connectivity - concess;
     const setup = (typeof calcTowers === 'function' ? calcTowers() : 0) + (typeof calcFreight === 'function' ? calcFreight() : 0);
+    const firstYear = annualCost + setup - concess;
     const net = gross - annualCost;
 
     document.getElementById('grand-total').textContent = fmtBig(net);
@@ -1261,14 +1265,14 @@
 
     document.getElementById('led-gross').textContent = fmt(gross);
     document.getElementById('led-cost').textContent = '–' + fmt(annualCost);
-    document.getElementById('led-cost-sub').textContent = 'Subscription + connectivity, less concessions (per year)';
+    document.getElementById('led-cost-sub').textContent = 'Subscription + connectivity (per year)';
     document.getElementById('led-net').textContent = fmtSigned(net);
 
     document.getElementById('stat-cow').textContent = fmtSigned(net / (cows || 1));
     document.getElementById('stat-ha').textContent = fmtSigned(net / (ha || 1));
     document.getElementById('stat-roi').textContent = annualCost > 0 ? (gross / annualCost).toFixed(1) + '×' : '—';
 
-    if (typeof renderCost === 'function') renderCost(subscription, connectivity, concess, annualCost, setup);
+    if (typeof renderCost === 'function') renderCost(subscription, connectivity, annualCost, setup, concess, firstYear);
 
     // Breakdown
     document.getElementById('breakdown').innerHTML = DRIVERS.map(k =>
@@ -1403,20 +1407,26 @@
   })();
   renderConc();
 
-  function renderCost(sub, conn, concess, annual, setup) {
+  function renderCost(sub, conn, annual, setup, concess, firstYear) {
     const bd = document.getElementById('cost-breakdown');
     if (bd) {
       const rows = [['Halter subscription', fmt(sub)]];
       if (state.connectivity) rows.push(['Internet / connectivity', fmt(conn)]);
-      concessions.forEach(r => { const a = concValue(r); if (a > 0) rows.push([concLabel(r), '–' + fmt(a)]); });
       bd.innerHTML = rows.map(r =>
         '<div class="brow"><span class="bname">' + r[0] + '</span><span class="bamt">' + r[1] + '</span></div>'
       ).join('');
     }
+    const cc = document.getElementById('cost-concessions');
+    if (cc) {
+      cc.innerHTML = concessions.map(r => {
+        const a = concValue(r);
+        return a > 0 ? '<div class="brow"><span class="bname">' + escAttr(concLabel(r)) + '</span><span class="bamt">–' + fmt(a) + '</span></div>' : '';
+      }).join('');
+    }
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     set('cost-annual', fmt(annual));
     set('cost-setup', fmt(setup));
-    set('cost-total', fmt(annual + setup));
+    set('cost-total', fmt(firstYear));
     refreshConcAuto();
   }
 
@@ -2061,6 +2071,9 @@
           '<div class="pr-sum">' +
             '<div class="pr-row pr-net"><span>Total annual cost</span><b data-costannual></b></div>' +
             '<div class="pr-row"><span>Setup — one-off</span><b data-costsetup></b></div>' +
+          '</div>' +
+          '<div class="pr-breakdown" data-costconc></div>' +
+          '<div class="pr-sum">' +
             '<div class="pr-row pr-net"><span>Total first-year cost</span><b data-costtotal></b></div>' +
           '</div>' +
           '<div class="pr-adesc" data-setupnote style="padding-top:6px"></div>' +
@@ -2096,11 +2109,11 @@
     const conn = (typeof calcConnectivity === 'function' ? calcConnectivity() : 0);
     const concess = (typeof concTotal === 'function' ? concTotal() : 0);
     const setup = (typeof calcTowers === 'function' ? calcTowers() : 0) + (typeof calcFreight === 'function' ? calcFreight() : 0);
-    const annual = sub + conn - concess;
+    const annual = sub + conn;
+    const firstYear = annual + setup - concess;
     const cbd = rep.querySelector('[data-costbd]');
     const crows = [['Halter subscription (annual)', fmt(sub)]];
     if (state.connectivity) crows.push(['Internet / connectivity (annual)', fmt(conn)]);
-    concessions.forEach(r => { const a = concValue(r); if (a > 0) crows.push([concLabel(r), '–' + fmt(a)]); });
     crows.forEach(pair => {
       const row = document.createElement('div');
       row.className = 'pr-brow';
@@ -2109,13 +2122,26 @@
       row.querySelector('b').textContent = pair[1];
       cbd.appendChild(row);
     });
+    const ccbd = rep.querySelector('[data-costconc]');
+    concessions.forEach(r => {
+      const a = concValue(r);
+      if (a <= 0) return;
+      const row = document.createElement('div');
+      row.className = 'pr-brow';
+      row.innerHTML = '<span></span><b></b>';
+      row.querySelector('span').textContent = concLabel(r);
+      row.querySelector('b').textContent = '–' + fmt(a);
+      ccbd.appendChild(row);
+    });
     rep.querySelector('[data-costannual]').textContent = fmt(annual);
     rep.querySelector('[data-costsetup]').textContent = fmt(setup);
-    rep.querySelector('[data-costtotal]').textContent = fmt(annual + setup);
+    rep.querySelector('[data-costtotal]').textContent = fmt(firstYear);
     const snote = [];
     if (state.towers) snote.push(pv('towers_count') + ' × tower @ $' + TOWER_COST.toLocaleString('en-NZ'));
     if (state.freight) snote.push('freight $' + FREIGHT_COST.toLocaleString('en-NZ'));
-    rep.querySelector('[data-setupnote]').textContent = snote.length ? 'Setup: ' + snote.join(' · ') : '';
+    let sn = snote.length ? 'Setup: ' + snote.join(' · ') : '';
+    if (concess > 0) sn += (sn ? ' · ' : '') + 'Concessions are first-year savings';
+    rep.querySelector('[data-setupnote]').textContent = sn;
 
     const notesVal = (document.getElementById('meeting_notes') || {}).value || '';
     const nEl = rep.querySelector('[data-notes]');

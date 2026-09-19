@@ -132,9 +132,11 @@ offer. Each concession has a free-text **description** and a **type**:
   `months × cows × per-collar price`, so it tracks the herd size and price
   automatically.
 
-Concessions reduce the annual Halter cost, are itemised in the Cost of Halter
-block (on screen and in the report, labelled by their description), and persist
-in saved meetings and auto-resume.
+Concessions are **one-off first-year savings**: they come off the total
+first-year cost (not the recurring annual cost, so they don't inflate the
+ongoing annual-profit headline), are itemised in the Cost of Halter block (on
+screen and in the report, labelled by their description), and persist in saved
+meetings and auto-resume.
 
 ## Meeting notes
 
