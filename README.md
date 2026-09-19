@@ -56,9 +56,9 @@ field stays editable for a custom quote (flagged as "custom price" in the hint).
 
 A value driver for the milk-solids lift from running split herds with Halter.
 Research indicates splitting the herd in half lifts milk solids by roughly 2%
-(sometimes ~1.5%), so the **milk solids uplift %** is editable (default 2%). The
-value is total herd production × uplift × milk price — i.e. `milking cows ×
-kgMS/cow × uplift% × milk price`. Off by default; shows its own working line and
+per cow (sometimes ~1.5%), so the **milk solids uplift per cow %** is editable
+(default 2%). The value applies the uplift per cow across the herd — i.e.
+`kgMS/cow × uplift% × milking cows × milk price`. Off by default; shows its own working line and
 prints in the report like the other drivers.
 
 ## Vehicles & maintenance

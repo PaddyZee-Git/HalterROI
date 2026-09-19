@@ -829,12 +829,12 @@
             <div class="dbody" data-body="split">
               <div class="fields">
                 <div class="field col-2">
-                  <div class="field-top"><label for="split_pct">Milk solids uplift</label>
+                  <div class="field-top"><label for="split_pct">Milk solids uplift per cow</label>
                     <span class="pill"><input type="number" id="split_pct" value="2" min="0" max="5" step="0.5"><span class="unit">%</span></span></div>
                   <input type="range" class="rng" data-for="split_pct" min="0" max="5" step="0.5" value="2">
                 </div>
               </div>
-              <div class="note">Research shows splitting the herd in half typically lifts milk solids ~2% (sometimes ~1.5%). Applied to total herd production × milk price.</div>
+              <div class="note">Research shows splitting the herd in half typically lifts milk solids ~2% per cow (sometimes ~1.5%). Applied per cow across the herd × milk price.</div>
               <div class="calc-note" data-calc="split"></div>
             </div>
           </div>
@@ -1446,8 +1446,8 @@
       return nz(cows) + ' cows × ' + v('winter_days') + ' days × ' + v('winter_feed') + ' kgDM × ' + v('winter_util') + '% = ' + nz(extra) + ' kgDM × $' + rate.toFixed(2) + '/kgDM = ' + fmt(extra * rate);
     }
     if (k === 'split') {
-      const ms = cows * v('kgms_cow');
-      return nz(cows) + ' cows × ' + v('kgms_cow') + ' kgMS = ' + nz(ms) + ' kgMS × ' + v('split_pct') + '% × $' + mp.toFixed(2) + ' = ' + fmt(ms * (v('split_pct') / 100) * mp);
+      const perCow = v('kgms_cow') * v('split_pct') / 100, totMs = perCow * cows;
+      return v('kgms_cow') + ' kgMS/cow × ' + v('split_pct') + '% = ' + nz(perCow) + ' kgMS/cow × ' + nz(cows) + ' cows = ' + nz(totMs) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(totMs * mp);
     }
     if (k === 'vehicles') {
       const total = fleetAnnual(), red = v('veh_reduction');
