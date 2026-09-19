@@ -107,18 +107,27 @@ drivers so they can be adjusted per farm/region: 6-week in-calf value ($/cow per
 calculations and the "how this is calculated" working lines, and persist in
 saved meetings.
 
-## Deployment cost
+## Deployment & connectivity, and the cost of Halter
 
-A "Deployment cost" section (after the value drivers) estimates the one-off cost
-of deploying Halter, as three switchable components:
+A "Deployment & connectivity" section provides three switchable components:
 
-- **Towers** — number of towers × $5,700 per tower
-- **Freight** — fixed $1,500 per deployment
-- **Internet / connectivity** — number of properties × $1,440/year ($120/month)
+- **Towers** — number of towers × $5,700 per tower — **one-off**
+- **Freight** — fixed $1,500 per deployment — **one-off**
+- **Internet / connectivity** — number of properties × $1,440/year — **annual**
 
-These sum to a **Total deployment cost** shown in the results. Deployment is a
-one-off setup cost, so it is reported separately and does **not** reduce the
-annual net value (which stays a clean per-year figure).
+The results and report show a **Cost of Halter** block that splits these
+correctly: the annual costs (collar subscription + connectivity, less any
+concessions) make up the **total annual cost**, towers + freight make up the
+**one-off setup**, and the two combine into a **total first-year cost**. The
+headline net annual value nets the value drivers against the **annual** Halter
+cost; the one-off setup is shown separately.
+
+## Concessions
+
+A "Concessions" section where the account manager adds the discounts they can
+offer — each a description and an annual `$/yr off` amount. Concessions reduce
+the annual Halter cost, are itemised in the Cost of Halter block (on screen and
+in the report), and persist in saved meetings and auto-resume.
 
 ## Meeting notes
 
