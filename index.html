@@ -435,13 +435,19 @@
   .veh-modal-reset { border: 0; background: none; color: var(--halter-cactus); font-size: 14px; font-weight: 500; cursor: pointer; padding: 8px 0; text-decoration: underline; }
   .veh-modal-done { height: 48px; padding: 0 26px; border: 0; border-radius: var(--radius-sm); background: var(--halter-green); color: #fff; font-weight: 600; font-size: 16px; cursor: pointer; }
 
-  .conc-row { display: flex; align-items: center; gap: 10px; }
+  .conc-row { border: 1px solid var(--halter-mist); border-radius: var(--radius-md); padding: 12px 14px; background: var(--halter-white); }
   .conc-row + .conc-row { margin-top: 10px; }
+  .conc-top { display: flex; align-items: center; gap: 10px; }
   .conc-desc { flex: 1; min-width: 0; height: 48px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); background: var(--halter-white); padding: 0 14px; font: inherit; font-size: 16px; color: var(--halter-ink); outline: none; }
   .conc-desc:focus { border-color: var(--halter-cactus); }
-  .conc-row .pill { min-width: 150px; }
   .conc-del { flex: none; width: 44px; height: 44px; border-radius: var(--radius-sm); border: 1px solid var(--halter-mist); background: var(--halter-white); color: var(--halter-graphite); font-size: 22px; line-height: 1; cursor: pointer; }
   .conc-del:hover { border-color: var(--halter-danger); color: var(--halter-danger); }
+  .conc-bot { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .conc-type { flex: none; width: auto; min-width: 160px; }
+  .conc-bot .pill { min-width: 150px; }
+  .conc-auto { display: inline-flex; align-items: baseline; gap: 4px; background: var(--halter-mint-cream); border: 1px solid transparent; border-radius: var(--radius-sm); padding: 8px 14px; min-width: 150px; justify-content: flex-end; font-family: var(--mono); }
+  .conc-autoval { font-size: 17px; font-weight: 600; color: var(--halter-green); font-variant-numeric: tabular-nums; }
+  .conc-auto .unit { color: var(--halter-cactus); font-size: 11px; }
 
   .extra-row { border: 1px solid var(--halter-mist); border-radius: var(--radius-md); padding: 14px; background: var(--halter-white); }
   .extra-row + .extra-row { margin-top: 12px; }
@@ -1331,29 +1337,69 @@
   }
 
   let concessions = [];
-  function concTotal() { return concessions.reduce((a, r) => a + (Number(r.amount) || 0), 0); }
+  const CONC_TYPES = [
+    { v: 'custom', name: 'Custom amount' },
+    { v: '1', name: '1 month free' },
+    { v: '2', name: '2 months free' },
+    { v: '3', name: '3 months free' },
+    { v: '6', name: '6 months free' }
+  ];
+  function concMonthlySub() { return v('cows') * v('collar'); }
+  function concValue(r) { return r.kind === 'months' ? (Number(r.months) || 0) * concMonthlySub() : (Number(r.amount) || 0); }
+  function concLabel(r) {
+    const t = (r.label || '').trim();
+    if (t) return t;
+    if (r.kind === 'months') { const n = Number(r.months) || 0; return n + ' month' + (n === 1 ? '' : 's') + ' free'; }
+    return 'Concession';
+  }
+  function concTotal() { return concessions.reduce((a, r) => a + concValue(r), 0); }
   function renderConc() {
     const list = document.getElementById('conc-list');
     if (!list) return;
-    list.innerHTML = concessions.map((r, i) =>
-      '<div class="conc-row">' +
-        '<input type="text" class="conc-f conc-desc" data-i="' + i + '" data-f="label" value="' + escAttr(r.label) + '" placeholder="Concession (e.g. 12-month price hold)">' +
-        '<span class="pill"><input type="number" class="conc-f" data-i="' + i + '" data-f="amount" value="' + r.amount + '" min="0" max="1000000" step="50"><span class="unit">$/yr off</span></span>' +
-        '<button type="button" class="conc-del" data-i="' + i + '" aria-label="Remove concession">×</button>' +
-      '</div>'
-    ).join('');
+    list.innerHTML = concessions.map((r, i) => {
+      const sel = r.kind === 'months' ? String(r.months) : 'custom';
+      const amountCell = r.kind === 'months'
+        ? '<span class="conc-auto"><span class="conc-autoval">–' + fmt(concValue(r)) + '</span><span class="unit">off</span></span>'
+        : '<span class="pill"><input type="number" class="conc-f" data-i="' + i + '" data-f="amount" value="' + r.amount + '" min="0" max="1000000" step="50"><span class="unit">$ off</span></span>';
+      return '<div class="conc-row">' +
+        '<div class="conc-top">' +
+          '<input type="text" class="conc-f conc-desc" data-i="' + i + '" data-f="label" value="' + escAttr(r.label) + '" placeholder="Concession (e.g. 1 month free, competitor buy-back)">' +
+          '<button type="button" class="conc-del" data-i="' + i + '" aria-label="Remove concession">×</button>' +
+        '</div>' +
+        '<div class="conc-bot">' +
+          '<select class="conc-type" data-i="' + i + '">' + CONC_TYPES.map(t => '<option value="' + t.v + '"' + (t.v === sel ? ' selected' : '') + '>' + t.name + '</option>').join('') + '</select>' +
+          amountCell +
+        '</div>' +
+      '</div>';
+    }).join('');
     list.querySelectorAll('.conc-f').forEach(inp => inp.addEventListener('input', e => {
       const i = +e.target.dataset.i, f = e.target.dataset.f;
       concessions[i][f] = f === 'amount' ? (e.target.value === '' ? 0 : parseFloat(e.target.value)) : e.target.value;
       calculate();
     }));
+    list.querySelectorAll('.conc-type').forEach(sel2 => sel2.addEventListener('change', e => {
+      const i = +e.target.dataset.i, val = e.target.value;
+      if (val === 'custom') concessions[i].kind = 'custom';
+      else { concessions[i].kind = 'months'; concessions[i].months = Number(val); }
+      renderConc(); calculate();
+    }));
     list.querySelectorAll('.conc-del').forEach(btn => btn.addEventListener('click', e => {
       concessions.splice(+e.currentTarget.dataset.i, 1); renderConc(); calculate();
     }));
   }
+  function refreshConcAuto() {
+    const list = document.getElementById('conc-list');
+    if (!list) return;
+    list.querySelectorAll('.conc-row').forEach((row, i) => {
+      const r = concessions[i];
+      if (!r || r.kind !== 'months') return;
+      const el = row.querySelector('.conc-autoval');
+      if (el) el.textContent = '–' + fmt(concValue(r));
+    });
+  }
   (function () {
     const addBtn = document.getElementById('conc-add');
-    if (addBtn) addBtn.addEventListener('click', () => { concessions.push({ label: '', amount: 0 }); renderConc(); calculate(); });
+    if (addBtn) addBtn.addEventListener('click', () => { concessions.push({ label: '', kind: 'custom', amount: 0, months: 1 }); renderConc(); calculate(); });
   })();
   renderConc();
 
@@ -1362,7 +1408,7 @@
     if (bd) {
       const rows = [['Halter subscription', fmt(sub)]];
       if (state.connectivity) rows.push(['Internet / connectivity', fmt(conn)]);
-      concessions.forEach(r => { const a = Number(r.amount) || 0; if (a > 0) rows.push([(r.label || '').trim() || 'Concession', '–' + fmt(a)]); });
+      concessions.forEach(r => { const a = concValue(r); if (a > 0) rows.push([concLabel(r), '–' + fmt(a)]); });
       bd.innerHTML = rows.map(r =>
         '<div class="brow"><span class="bname">' + r[0] + '</span><span class="bamt">' + r[1] + '</span></div>'
       ).join('');
@@ -1371,6 +1417,7 @@
     set('cost-annual', fmt(annual));
     set('cost-setup', fmt(setup));
     set('cost-total', fmt(annual + setup));
+    refreshConcAuto();
   }
 
   const PRICING = {
@@ -1899,7 +1946,7 @@
       activeExpr = null;
       renderExtras();
     }
-    concessions = Array.isArray(s.concessions) ? s.concessions.map(r => ({ label: r.label || '', amount: Number(r.amount) || 0 })) : [];
+    concessions = Array.isArray(s.concessions) ? s.concessions.map(r => ({ label: r.label || '', kind: r.kind === 'months' ? 'months' : 'custom', amount: Number(r.amount) || 0, months: Number(r.months) || 1 })) : [];
     renderConc();
     const notesEl = document.getElementById('meeting_notes');
     if (notesEl) notesEl.value = s.notes || '';
@@ -2053,7 +2100,7 @@
     const cbd = rep.querySelector('[data-costbd]');
     const crows = [['Halter subscription (annual)', fmt(sub)]];
     if (state.connectivity) crows.push(['Internet / connectivity (annual)', fmt(conn)]);
-    concessions.forEach(r => { const a = Number(r.amount) || 0; if (a > 0) crows.push([(r.label || '').trim() || 'Concession', '–' + fmt(a)]); });
+    concessions.forEach(r => { const a = concValue(r); if (a > 0) crows.push([concLabel(r), '–' + fmt(a)]); });
     crows.forEach(pair => {
       const row = document.createElement('div');
       row.className = 'pr-brow';

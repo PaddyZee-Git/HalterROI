@@ -124,10 +124,17 @@ cost; the one-off setup is shown separately.
 
 ## Concessions
 
-A "Concessions" section where the account manager adds the discounts they can
-offer — each a description and an annual `$/yr off` amount. Concessions reduce
-the annual Halter cost, are itemised in the Cost of Halter block (on screen and
-in the report), and persist in saved meetings and auto-resume.
+A "Concessions" section where the account manager lists the discounts they can
+offer. Each concession has a free-text **description** and a **type**:
+
+- **Custom amount** — enter any `$ off` (e.g. a competitor collar buy-back).
+- **N months free** (1 / 2 / 3 / 6) — auto-calculated from the Halter package as
+  `months × cows × per-collar price`, so it tracks the herd size and price
+  automatically.
+
+Concessions reduce the annual Halter cost, are itemised in the Cost of Halter
+block (on screen and in the report, labelled by their description), and persist
+in saved meetings and auto-resume.
 
 ## Meeting notes
 
