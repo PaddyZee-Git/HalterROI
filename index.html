@@ -370,7 +370,10 @@
   .pr-net { border-bottom: 0; border-top: 1.5px solid var(--halter-green); margin-top: 3px; padding-top: 6px; }
   .pr-net span { color: var(--halter-ink); font-weight: 600; }
   .pr-net b { color: var(--halter-green); font-size: 13px; }
-  .pr-off { color: var(--halter-graphite) !important; font-weight: 400 !important; font-style: italic; }
+  .pr-off { color: var(--halter-graphite) !important; font-weight: 400 !important; font-style: italic; font-size: 12px !important; }
+  .pr-value .pr-brow { padding: 5px 0; font-size: 14px; }
+  .pr-value .pr-brow span { color: var(--halter-ink); font-weight: 500; }
+  .pr-value .pr-brow b { font-size: 16px; color: var(--halter-green); }
   .pr-arow { padding: 3px 0; font-size: 10px; line-height: 1.32; border-bottom: 1px solid var(--halter-platinum); }
   .pr-arow:last-child { border-bottom: 0; }
   .pr-aname { font-weight: 600; color: var(--halter-ink); }
@@ -2058,7 +2061,7 @@
       '<div class="pr-chips" data-kv></div>' +
       '<div class="pr-cols">' +
         '<div class="pr-col">' +
-          '<h2>Where the value comes from</h2><div class="pr-breakdown" data-breakdown></div>' +
+          '<h2>Where the value comes from</h2><div class="pr-breakdown pr-value" data-breakdown></div>' +
           '<div class="pr-sum">' +
             '<div class="pr-row"><span>Gross annual value</span><b data-gross></b></div>' +
             '<div class="pr-row"><span>Halter cost (annual)</span><b data-cost></b></div>' +
