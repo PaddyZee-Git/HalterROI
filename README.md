@@ -52,6 +52,15 @@ months upfront), using Halter's Australian per-collar/month pricing (excl. GST):
 Selecting a package/term fills the per-collar price automatically. The price
 field stays editable for a custom quote (flagged as "custom price" in the hint).
 
+## Herd splitting
+
+A value driver for the milk-solids lift from running split herds with Halter.
+Research indicates splitting the herd in half lifts milk solids by roughly 2%
+(sometimes ~1.5%), so the **milk solids uplift %** is editable (default 2%). The
+value is total herd production × uplift × milk price — i.e. `milking cows ×
+kgMS/cow × uplift% × milk price`. Off by default; shows its own working line and
+prints in the report like the other drivers.
+
 ## Vehicles & maintenance
 
 A value driver estimating the saving from reduced reliance on farm vehicles.

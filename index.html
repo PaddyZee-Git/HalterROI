@@ -818,6 +818,27 @@
             </div>
           </div>
 
+          <div class="driver" data-driver="split">
+            <div class="dhead">
+              <button class="dtog" data-tog="split" aria-label="Toggle herd splitting"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/></svg></span>
+              <div class="dmeta"><h3>Herd splitting</h3><p>Milk solids lift from running split herds with Halter</p></div>
+              <div class="dval" data-dv="split">—</div>
+              <svg class="chev" data-chev="split" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="split">
+              <div class="fields">
+                <div class="field col-2">
+                  <div class="field-top"><label for="split_pct">Milk solids uplift</label>
+                    <span class="pill"><input type="number" id="split_pct" value="2" min="0" max="5" step="0.5"><span class="unit">%</span></span></div>
+                  <input type="range" class="rng" data-for="split_pct" min="0" max="5" step="0.5" value="2">
+                </div>
+              </div>
+              <div class="note">Research shows splitting the herd in half typically lifts milk solids ~2% (sometimes ~1.5%). Applied to total herd production × milk price.</div>
+              <div class="calc-note" data-calc="split"></div>
+            </div>
+          </div>
+
           <div class="driver" data-driver="vehicles">
             <div class="dhead">
               <button class="dtog" data-tog="vehicles" aria-label="Toggle vehicles and maintenance"></button>
@@ -1058,13 +1079,13 @@
 </footer>
 
 <script>
-  const DRIVERS = ['pasture','quality','repro','lameness','labour','winter','vehicles','extra'];
+  const DRIVERS = ['pasture','quality','repro','lameness','labour','winter','split','vehicles','extra'];
   const LABELS = {
     pasture: 'Pasture utilisation', quality: 'Pasture quality', repro: 'Reproduction',
-    lameness: 'Lameness', labour: 'Labour', winter: 'Winter crop', vehicles: 'Vehicles & maintenance',
-    extra: 'Other'
+    lameness: 'Lameness', labour: 'Labour', winter: 'Winter crop', split: 'Herd splitting',
+    vehicles: 'Vehicles & maintenance', extra: 'Other'
   };
-  const state = { pasture:true, quality:false, repro:true, lameness:false, labour:false, winter:false };
+  const state = { pasture:true, quality:false, repro:true, lameness:false, labour:false, winter:false, split:false };
 
   const fmt = n => '$' + Math.round(n).toLocaleString('en-NZ');
   const fmtSigned = n => { const a = Math.round(n); const s = a > 0 ? '+' : a < 0 ? '-' : ''; return s + '$' + Math.abs(a).toLocaleString('en-NZ'); };
@@ -1165,11 +1186,16 @@
     const extra = v('cows') * v('winter_days') * v('winter_feed') * (v('winter_util') / 100);
     return extra * (document.getElementById('winter_type').value === 'grow' ? A('a_winter_grow', 0.20) : A('a_winter_buy', 0.35));
   }
+  function calcSplit() {
+    if (!state.split) return 0;
+    return v('cows') * v('kgms_cow') * (v('split_pct') / 100) * v('milkprice');
+  }
 
   function calculate() {
     const vals = {
       pasture: calcPasture(), quality: calcQuality(), repro: calcRepro(),
       lameness: calcLameness(), labour: calcLabour(), winter: calcWinter(),
+      split: calcSplit(),
       vehicles: (typeof calcVehicles === 'function' ? calcVehicles() : 0),
       extra: (typeof calcExtra === 'function' ? calcExtra() : 0)
     };
@@ -1418,6 +1444,10 @@
       const extra = cows * v('winter_days') * v('winter_feed') * (v('winter_util') / 100);
       const rate = document.getElementById('winter_type').value === 'grow' ? A('a_winter_grow', 0.20) : A('a_winter_buy', 0.35);
       return nz(cows) + ' cows × ' + v('winter_days') + ' days × ' + v('winter_feed') + ' kgDM × ' + v('winter_util') + '% = ' + nz(extra) + ' kgDM × $' + rate.toFixed(2) + '/kgDM = ' + fmt(extra * rate);
+    }
+    if (k === 'split') {
+      const ms = cows * v('kgms_cow');
+      return nz(cows) + ' cows × ' + v('kgms_cow') + ' kgMS = ' + nz(ms) + ' kgMS × ' + v('split_pct') + '% × $' + mp.toFixed(2) + ' = ' + fmt(ms * (v('split_pct') / 100) * mp);
     }
     if (k === 'vehicles') {
       const total = fleetAnnual(), red = v('veh_reduction');
