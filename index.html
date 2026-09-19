@@ -343,42 +343,41 @@
   .pkg-table-foot { font-size: 11px; color: var(--halter-graphite); padding: 9px 12px; background: var(--halter-white); }
 
   /* ---------- Print report ---------- */
-  #print-report { display: none; color: var(--halter-ink); font-size: 12px; line-height: 1.42; }
-  .pr-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 2px solid var(--halter-green); margin-bottom: 14px; }
-  .pr-logo { height: 30px; width: auto; display: block; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  #print-report { display: none; color: var(--halter-ink); font-size: 11px; line-height: 1.34; }
+  .pr-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 2px solid var(--halter-green); margin-bottom: 12px; }
+  .pr-logo { height: 27px; width: auto; display: block; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .pr-headmeta { text-align: right; }
-  .pr-tag { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: .14em; font-weight: 500; color: var(--halter-graphite); }
-  .pr-name { display: block; font-size: 17px; font-weight: 600; color: var(--halter-ink); letter-spacing: -0.01em; margin-top: 2px; }
-  .pr-hero { display: flex; align-items: center; justify-content: space-between; gap: 20px; background: var(--halter-green); color: #fff; border-radius: 10px; padding: 15px 22px; margin-bottom: 16px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .pr-hero-k { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--halter-lime); font-weight: 600; }
-  .pr-hero-v { font-size: 36px; font-weight: 600; letter-spacing: -.02em; margin: 2px 0; font-variant-numeric: tabular-nums; line-height: 1; }
-  .pr-hero-sub { font-size: 11px; color: rgba(255,255,255,.72); }
-  .pr-hero-stats { display: flex; gap: 24px; flex: none; }
+  .pr-tag { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: .14em; font-weight: 500; color: var(--halter-graphite); }
+  .pr-name { display: block; font-size: 16px; font-weight: 600; color: var(--halter-ink); letter-spacing: -0.01em; margin-top: 1px; }
+  .pr-hero { display: flex; align-items: center; justify-content: space-between; gap: 18px; background: var(--halter-green); color: #fff; border-radius: 9px; padding: 12px 20px; margin-bottom: 12px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .pr-hero-k { font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: var(--halter-lime); font-weight: 600; }
+  .pr-hero-v { font-size: 30px; font-weight: 600; letter-spacing: -.02em; margin: 1px 0; font-variant-numeric: tabular-nums; line-height: 1; }
+  .pr-hero-sub { font-size: 10px; color: rgba(255,255,255,.72); }
+  .pr-hero-stats { display: flex; gap: 20px; flex: none; }
   .pr-hero-stats div { text-align: right; }
-  .pr-hero-stats span { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: .08em; color: var(--halter-lime); font-weight: 600; }
-  .pr-hero-stats b { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .pr-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
-  .pr-chip { border: 1px solid var(--halter-mist); border-radius: 999px; padding: 3px 11px; font-size: 11px; color: var(--halter-ink); font-variant-numeric: tabular-nums; }
+  .pr-hero-stats span { display: block; font-size: 8.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--halter-lime); font-weight: 600; }
+  .pr-hero-stats b { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .pr-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+  .pr-chip { border: 1px solid var(--halter-mist); border-radius: 999px; padding: 2px 10px; font-size: 10px; color: var(--halter-ink); font-variant-numeric: tabular-nums; }
   .pr-chip i { color: var(--halter-graphite); font-style: normal; margin-right: 5px; }
-  .pr-cols { display: grid; grid-template-columns: 1.35fr 1fr; gap: 24px; }
-  #print-report h2 { font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--halter-green); margin: 0 0 6px; padding-bottom: 5px; border-bottom: 1px solid var(--halter-mist); }
-  #print-report h2:not(:first-child) { margin-top: 16px; }
-  .pr-row, .pr-brow { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 12px; border-bottom: 1px solid var(--halter-platinum); }
+  .pr-cols { display: grid; grid-template-columns: 1fr 1.32fr; gap: 22px; align-items: start; }
+  #print-report h2 { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--halter-green); margin: 0 0 4px; padding-bottom: 4px; border-bottom: 1px solid var(--halter-mist); }
+  #print-report h2:not(:first-child) { margin-top: 13px; }
+  .pr-row, .pr-brow { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; font-size: 11px; border-bottom: 1px solid var(--halter-platinum); }
   .pr-row span, .pr-brow span { color: var(--halter-graphite); }
   .pr-row b, .pr-brow b { color: var(--halter-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .pr-sum { margin-top: 8px; }
-  .pr-net { border-bottom: 0; border-top: 1.5px solid var(--halter-green); margin-top: 4px; padding-top: 8px; }
+  .pr-sum { margin-top: 6px; }
+  .pr-net { border-bottom: 0; border-top: 1.5px solid var(--halter-green); margin-top: 3px; padding-top: 6px; }
   .pr-net span { color: var(--halter-ink); font-weight: 600; }
-  .pr-net b { color: var(--halter-green); font-size: 14px; }
+  .pr-net b { color: var(--halter-green); font-size: 13px; }
   .pr-off { color: var(--halter-graphite) !important; font-weight: 400 !important; font-style: italic; }
-  .pr-how { margin-top: 16px; }
-  .pr-arow { padding: 5px 0; font-size: 11px; border-bottom: 1px solid var(--halter-platinum); }
+  .pr-arow { padding: 3px 0; font-size: 10px; line-height: 1.32; border-bottom: 1px solid var(--halter-platinum); }
   .pr-arow:last-child { border-bottom: 0; }
   .pr-aname { font-weight: 600; color: var(--halter-ink); }
-  .pr-adesc { color: var(--halter-graphite); margin-top: 1px; line-height: 1.38; }
-  .pr-foot { margin-top: 16px; padding-top: 10px; border-top: 1px solid var(--halter-mist); font-size: 10.5px; color: var(--halter-graphite); text-align: center; }
-  .pr-notes { margin-top: 14px; }
-  .pr-notes-body { font-size: 11.5px; color: var(--halter-ink); line-height: 1.5; white-space: pre-wrap; }
+  .pr-adesc { color: var(--halter-graphite); }
+  .pr-foot { margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--halter-mist); font-size: 10px; color: var(--halter-graphite); text-align: center; }
+  .pr-notes { margin-top: 12px; }
+  .pr-notes-body { font-size: 11px; color: var(--halter-ink); line-height: 1.45; white-space: pre-wrap; }
 
   .pill { padding: 10px 14px; min-width: 128px; font-size: 17px; }
   .pill input { width: 90px; font-size: 17px; }
@@ -2077,9 +2076,9 @@
             '<div class="pr-row pr-net"><span>Total first-year cost</span><b data-costtotal></b></div>' +
           '</div>' +
           '<div class="pr-adesc" data-setupnote style="padding-top:6px"></div>' +
+          '<h2>How each value is calculated</h2><div class="pr-assump" data-assump></div>' +
         '</div>' +
       '</div>' +
-      '<div class="pr-how"><h2>How each value is calculated</h2><div class="pr-assump" data-assump></div></div>' +
       '<div class="pr-notes" data-notes hidden><h2>Notes</h2><div class="pr-notes-body"></div></div>' +
       '<div class="pr-foot">Halter Dairy ROI Calculator · For internal use only. Do not share.</div>';
 
@@ -2179,12 +2178,12 @@
     active.forEach(k => {
       const r = document.createElement('div');
       r.className = 'pr-arow';
-      const n = document.createElement('div');
+      const n = document.createElement('span');
       n.className = 'pr-aname';
       n.textContent = LABELS[k];
-      const d = document.createElement('div');
+      const d = document.createElement('span');
       d.className = 'pr-adesc';
-      d.textContent = workingText(k);
+      d.textContent = ' — ' + workingText(k);
       r.appendChild(n);
       r.appendChild(d);
       as.appendChild(r);
