@@ -169,6 +169,23 @@ Meetings are stored on the device in the browser's `localStorage`, so they
 persist across reloads and work offline, but they live only in the browser (or
 installed app) they were saved in — they are not synced between devices.
 
+> ⚠️ **Because storage is on-device, it can be cleared.** Deleting the
+> Home-Screen icon on an iPad/iPhone, or iOS's ~7-day purge of an unused web
+> app's storage, will wipe saved meetings. Use **Back up** regularly (see
+> below), and always back up before deleting/re-adding the Home-Screen icon.
+
+### Back up / restore
+
+The Saved meetings panel has **Back up** and **Restore** buttons:
+
+- **Back up** downloads a single JSON file (`Halter ROI meetings <date>.json`)
+  containing every saved meeting. Keep it in Files/iCloud/email — it's your
+  safety copy and it also lets you move meetings to another device.
+- **Restore** reads a backup file and **merges** it into the current saved
+  meetings (de-duping by id, keeping the newer copy of any clash), so restoring
+  never deletes what's already there. This is how you recover after storage is
+  cleared, or copy meetings onto a new iPad.
+
 ## Printing / exporting a meeting
 
 Tap **Print / PDF** (next to Save meeting) to produce a clean, one-page Halter

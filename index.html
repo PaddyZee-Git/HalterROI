@@ -290,6 +290,10 @@
   .saved-panel { margin: 0 0 80px; }
   .saved-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
   .saved-head h2 { font-size: 14px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--halter-ink); margin: 0; }
+  .saved-tools { display: flex; gap: 8px; flex: none; }
+  .btn-tool { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm); background: transparent; color: var(--halter-graphite); font-size: 13px; font-weight: 500; transition: border-color .15s var(--ease), color .15s var(--ease); }
+  .btn-tool:hover { border-color: var(--halter-cactus); color: var(--halter-green); }
+  .btn-tool svg { width: 15px; height: 15px; }
   .saved-empty {
     font-size: 13px; color: var(--halter-graphite); background: var(--halter-white);
     border: 1px dashed var(--halter-mist); border-radius: var(--radius-md); padding: 22px; text-align: center; line-height: 1.5;
@@ -1127,8 +1131,19 @@
     <div class="saved-head">
       <h2>Saved meetings</h2>
       <span class="sec-rule"></span>
+      <div class="saved-tools">
+        <button type="button" id="backup-meetings" class="btn-tool" title="Download a backup file of all saved meetings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Back up
+        </button>
+        <button type="button" id="restore-meetings" class="btn-tool" title="Restore saved meetings from a backup file">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 9l5-5 5 5"/><path d="M12 4v12"/></svg>
+          Restore
+        </button>
+        <input type="file" id="restore-file" accept="application/json,.json" hidden>
+      </div>
     </div>
-    <div id="saved-empty" class="saved-empty">No saved meetings yet. Enter a meeting name above and tap “Save meeting” to keep this calculation on this device.</div>
+    <div id="saved-empty" class="saved-empty">No saved meetings yet. Enter a meeting name above and tap “Save meeting” to keep this calculation on this device. Tip: tap <strong>Back up</strong> to save a copy you can keep or move to another device.</div>
     <div id="saved-list"></div>
   </div>
 
@@ -2004,6 +2019,60 @@
     }
   }
 
+  // --- Back up / restore all saved meetings to a file (so they survive icon
+  //     re-adds, iOS storage clearing, or moving to another device) ---
+  function backupMeetings() {
+    const list = loadSessions();
+    if (!list.length) { flash('No saved meetings to back up yet.'); return; }
+    const payload = { app: 'halter-roi-au', type: 'meetings-backup', version: 1,
+                      exportedAt: new Date().toISOString(), meetings: list };
+    const stamp = new Date().toISOString().slice(0, 10);
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Halter ROI meetings ' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    flash('Backed up ' + list.length + ' meeting' + (list.length === 1 ? '' : 's') + '.');
+  }
+
+  function restoreMeetings(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      let incoming;
+      try {
+        const parsed = JSON.parse(reader.result);
+        incoming = Array.isArray(parsed) ? parsed : (parsed && parsed.meetings);
+      } catch (e) { incoming = null; }
+      if (!Array.isArray(incoming) || !incoming.length) {
+        flash('That file doesn’t look like a Halter meetings backup.');
+        return;
+      }
+      // Merge into existing, de-duping by id (keep the newer of any clash).
+      const existing = loadSessions();
+      const byId = {};
+      existing.forEach(m => { if (m && m.id) byId[m.id] = m; });
+      let added = 0;
+      incoming.forEach(m => {
+        if (!m || !m.id || !m.data) return;
+        const prev = byId[m.id];
+        if (!prev) { byId[m.id] = m; added++; }
+        else if (new Date(m.savedAt) > new Date(prev.savedAt)) { byId[m.id] = m; }
+      });
+      const merged = Object.keys(byId).map(k => byId[k])
+        .sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+      persist(merged);
+      renderSaved();
+      flash(added ? ('Restored ' + added + ' meeting' + (added === 1 ? '' : 's') + '.')
+                  : 'Backup already up to date — nothing new to add.');
+    };
+    reader.onerror = () => flash('Could not read that file.');
+    reader.readAsText(file);
+  }
+
   let flashTimer;
   function flash(msg) {
     let t = document.getElementById('toast');
@@ -2269,6 +2338,13 @@
   }
   document.getElementById('new-meeting').addEventListener('click', startNewMeeting);
   document.getElementById('new-meeting-top').addEventListener('click', startNewMeeting);
+  document.getElementById('backup-meetings').addEventListener('click', backupMeetings);
+  document.getElementById('restore-meetings').addEventListener('click', () => document.getElementById('restore-file').click());
+  document.getElementById('restore-file').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (f) restoreMeetings(f);
+    e.target.value = '';
+  });
   document.querySelectorAll('input[name=pkg], input[name=term]').forEach(el => el.addEventListener('change', applyPackagePrice));
   document.getElementById('pasture_lift').addEventListener('input', fromLift);
   document.getElementById('pasture_lift_rng').addEventListener('input', () => { document.getElementById('pasture_lift').value = document.getElementById('pasture_lift_rng').value; fromLift(); });
