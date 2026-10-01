@@ -716,40 +716,6 @@
             </div>
           </div>
 
-          <!-- Pasture quality -->
-          <div class="driver" data-driver="quality">
-            <div class="dhead">
-              <button class="dtog" data-tog="quality" aria-label="Toggle pasture quality"></button>
-              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg></span>
-              <div class="dmeta"><h3>Pasture quality (MJME)</h3><p>Value from higher-energy pasture through consistent residuals</p></div>
-              <div class="dval" data-dv="quality">—</div>
-              <svg class="chev" data-chev="quality" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </div>
-            <div class="dbody" data-body="quality">
-              <div class="fields">
-                <div class="field">
-                  <div class="field-top"><label for="mjme_gain">MJME improvement</label>
-                    <span class="pill"><input type="number" id="mjme_gain" value="0.2" min="0.05" max="1" step="0.05"><span class="unit">per kgDM</span></span></div>
-                  <input type="range" class="rng" data-for="mjme_gain" min="0.05" max="1" step="0.05" value="0.2">
-                </div>
-                <div class="field">
-                  <div class="field-top"><label for="mjme_current">Current avg MJME</label>
-                    <span class="pill"><input type="number" id="mjme_current" value="11.5" min="9" max="14" step="0.1"><span class="unit">MJME</span></span></div>
-                  <input type="range" class="rng" data-for="mjme_current" min="9" max="14" step="0.1" value="11.5">
-                </div>
-                <div class="selrow col-2">
-                  <label for="quality_use">Value this improvement as</label>
-                  <select id="quality_use">
-                    <option value="pasture" selected>Additional pasture grown</option>
-                    <option value="milk">Increased milk production</option>
-                  </select>
-                </div>
-              </div>
-              <div class="note">Total extra MJME = DM harvested × ha × MJME gain. Pasture option divides by current MJME then values via FCE + milk price. Milk option divides by 80 MJME per kgMS.</div>
-              <div class="calc-note" data-calc="quality"></div>
-            </div>
-          </div>
-
           <!-- Reproduction -->
           <div class="driver active" data-driver="repro">
             <div class="dhead">
@@ -890,23 +856,6 @@
             </div>
           </div>
 
-          <div class="driver" data-driver="extra">
-            <div class="dhead">
-              <button class="dtog" data-tog="extra" aria-label="Toggle other"></button>
-              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h8"/><path d="M8 18h4"/></svg></span>
-              <div class="dmeta"><h3>Other</h3><p>Custom value or cost items unique to this operation</p></div>
-              <div class="dval" data-dv="extra">—</div>
-              <svg class="chev" data-chev="extra" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </div>
-            <div class="dbody" data-body="extra">
-              <div id="extra-list" class="veh-list"></div>
-              <button type="button" id="extra-add" class="btn-add-veh">Add item</button>
-              <div class="extra-pad" id="extra-pad"></div>
-              <div class="extra-pad-hint">Tap a calculation field and write the sum with your pen (e.g. 3000 − 1200 + 500) — iPad handwriting turns it into numbers and it works out the total as you go. Or use the keypad. Set each item to add value or be a cost.</div>
-              <div class="calc-note" data-calc="extra"></div>
-            </div>
-          </div>
-
           <!-- Winter crop -->
           <div class="driver" data-driver="winter">
             <div class="dhead">
@@ -942,6 +891,57 @@
                 </div>
               </div>
               <div class="calc-note" data-calc="winter"></div>
+            </div>
+          </div>
+
+          <!-- Pasture quality -->
+          <div class="driver" data-driver="quality">
+            <div class="dhead">
+              <button class="dtog" data-tog="quality" aria-label="Toggle pasture quality"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg></span>
+              <div class="dmeta"><h3>Pasture quality (MJME)</h3><p>Value from higher-energy pasture through consistent residuals</p></div>
+              <div class="dval" data-dv="quality">—</div>
+              <svg class="chev" data-chev="quality" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="quality">
+              <div class="fields">
+                <div class="field">
+                  <div class="field-top"><label for="mjme_gain">MJME improvement</label>
+                    <span class="pill"><input type="number" id="mjme_gain" value="0.2" min="0.05" max="1" step="0.05"><span class="unit">per kgDM</span></span></div>
+                  <input type="range" class="rng" data-for="mjme_gain" min="0.05" max="1" step="0.05" value="0.2">
+                </div>
+                <div class="field">
+                  <div class="field-top"><label for="mjme_current">Current avg MJME</label>
+                    <span class="pill"><input type="number" id="mjme_current" value="11.5" min="9" max="14" step="0.1"><span class="unit">MJME</span></span></div>
+                  <input type="range" class="rng" data-for="mjme_current" min="9" max="14" step="0.1" value="11.5">
+                </div>
+                <div class="selrow col-2">
+                  <label for="quality_use">Value this improvement as</label>
+                  <select id="quality_use">
+                    <option value="pasture" selected>Additional pasture grown</option>
+                    <option value="milk">Increased milk production</option>
+                  </select>
+                </div>
+              </div>
+              <div class="note">Total extra MJME = DM harvested × ha × MJME gain. Pasture option divides by current MJME then values via FCE + milk price. Milk option divides by 80 MJME per kgMS.</div>
+              <div class="calc-note" data-calc="quality"></div>
+            </div>
+          </div>
+
+          <div class="driver" data-driver="extra">
+            <div class="dhead">
+              <button class="dtog" data-tog="extra" aria-label="Toggle other"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h8"/><path d="M8 18h4"/></svg></span>
+              <div class="dmeta"><h3>Other</h3><p>Custom value or cost items unique to this operation</p></div>
+              <div class="dval" data-dv="extra">—</div>
+              <svg class="chev" data-chev="extra" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="extra">
+              <div id="extra-list" class="veh-list"></div>
+              <button type="button" id="extra-add" class="btn-add-veh">Add item</button>
+              <div class="extra-pad" id="extra-pad"></div>
+              <div class="extra-pad-hint">Tap a calculation field and write the sum with your pen (e.g. 3000 − 1200 + 500) — iPad handwriting turns it into numbers and it works out the total as you go. Or use the keypad. Set each item to add value or be a cost.</div>
+              <div class="calc-note" data-calc="extra"></div>
             </div>
           </div>
 
@@ -1150,7 +1150,7 @@
 <script src="assets/vendor/jspdf.umd.min.js"></script>
 
 <script>
-  const DRIVERS = ['pasture','labour','quality','repro','lameness','vehicles','split','extra','winter'];
+  const DRIVERS = ['pasture','labour','repro','lameness','vehicles','split','winter','quality','extra'];
   const LABELS = {
     pasture: 'Pasture utilisation', quality: 'Pasture quality', repro: 'Reproduction',
     lameness: 'Lameness', labour: 'Labour', winter: 'Winter crop', split: 'Herd splitting',
