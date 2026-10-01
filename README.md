@@ -145,9 +145,10 @@ auto-resume, and print on the report (under a "Notes" heading) when present.
 
 ## New meeting
 
-A "New meeting" button in the meeting bar resets every section back to defaults —
-like a fresh document — after a confirm. It clears the current working state and
-reloads; saved meetings are kept.
+A "New meeting" button resets every section back to defaults — like a fresh
+document — after a confirm. It clears the current working state and reloads;
+saved meetings are kept. There are two: one at the top of the inputs panel next
+to **Save meeting** (in the meeting bar), and one at the bottom of the page.
 
 ## Auto-resume
 

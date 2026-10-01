@@ -278,6 +278,13 @@
   }
   .btn-save:hover { background: #20402f; }
   .btn-save svg { width: 16px; height: 16px; }
+  .btn-newmeeting-top {
+    height: 44px; padding: 0 18px; border: 1px solid var(--halter-mist); border-radius: var(--radius-sm);
+    background: transparent; color: var(--halter-graphite); font-weight: 500; font-size: 14px;
+    display: inline-flex; align-items: center; gap: 8px; transition: border-color .15s var(--ease), color .15s var(--ease);
+  }
+  .btn-newmeeting-top:hover { border-color: var(--halter-cactus); color: var(--halter-green); }
+  .btn-newmeeting-top svg { width: 16px; height: 16px; }
 
   /* ---------- Saved meetings ---------- */
   .saved-panel { margin: 0 0 80px; }
@@ -529,6 +536,10 @@
         <button type="button" id="save-meeting-2" class="btn-save">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
           Save meeting
+        </button>
+        <button type="button" id="new-meeting-top" class="btn-newmeeting-top">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+          New meeting
         </button>
       </div>
 
@@ -2248,12 +2259,14 @@
   document.getElementById('save-meeting').addEventListener('click', saveMeeting);
   document.getElementById('save-meeting-2').addEventListener('click', saveMeeting);
   document.getElementById('print-meeting').addEventListener('click', () => printReport());
-  document.getElementById('new-meeting').addEventListener('click', () => {
+  function startNewMeeting() {
     if (confirm('Start a new meeting? This clears the current calculation. Saved meetings are kept.')) {
       try { localStorage.removeItem(LS_AUTO); } catch (e) {}
       location.reload();
     }
-  });
+  }
+  document.getElementById('new-meeting').addEventListener('click', startNewMeeting);
+  document.getElementById('new-meeting-top').addEventListener('click', startNewMeeting);
   document.querySelectorAll('input[name=pkg], input[name=term]').forEach(el => el.addEventListener('change', applyPackagePrice));
   document.getElementById('pasture_lift').addEventListener('input', fromLift);
   document.getElementById('pasture_lift_rng').addEventListener('input', () => { document.getElementById('pasture_lift').value = document.getElementById('pasture_lift_rng').value; fromLift(); });
