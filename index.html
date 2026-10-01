@@ -826,65 +826,6 @@
             </div>
           </div>
 
-          <!-- Winter crop -->
-          <div class="driver" data-driver="winter">
-            <div class="dhead">
-              <button class="dtog" data-tog="winter" aria-label="Toggle winter crop"></button>
-              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m2 12 10 0 10 0"/><path d="M12 2v20"/><path d="m4.93 4.93 14.14 14.14"/><path d="m19.07 4.93-14.14 14.14"/></svg></span>
-              <div class="dmeta"><h3>Winter crop</h3><p>Improved utilisation of kale and fodder crops</p></div>
-              <div class="dval" data-dv="winter">—</div>
-              <svg class="chev" data-chev="winter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </div>
-            <div class="dbody" data-body="winter">
-              <div class="fields">
-                <div class="field">
-                  <div class="field-top"><label for="winter_days">Days on winter crop</label>
-                    <span class="pill"><input type="number" id="winter_days" value="70" min="10" max="150" step="1"><span class="unit">days</span></span></div>
-                  <input type="range" class="rng" data-for="winter_days" min="10" max="150" step="1" value="70">
-                </div>
-                <div class="field">
-                  <div class="field-top"><label for="winter_feed">Feed offered</label>
-                    <span class="pill"><input type="number" id="winter_feed" value="10" min="5" max="20" step="0.5"><span class="unit">kgDM/cow/day</span></span></div>
-                  <input type="range" class="rng" data-for="winter_feed" min="5" max="20" step="0.5" value="10">
-                </div>
-                <div class="field">
-                  <div class="field-top"><label for="winter_util">Utilisation improvement</label>
-                    <span class="pill"><input type="number" id="winter_util" value="10" min="2" max="25" step="1"><span class="unit">%</span></span></div>
-                  <input type="range" class="rng" data-for="winter_util" min="2" max="25" step="1" value="10">
-                </div>
-                <div class="selrow">
-                  <label for="winter_type">Measure saving as</label>
-                  <select id="winter_type">
-                    <option value="grow">Less crop to grow ($0.20/kgDM)</option>
-                    <option value="buy" selected>Less crop to buy ($0.35/kgDM)</option>
-                  </select>
-                </div>
-              </div>
-              <div class="calc-note" data-calc="winter"></div>
-            </div>
-          </div>
-
-          <div class="driver" data-driver="split">
-            <div class="dhead">
-              <button class="dtog" data-tog="split" aria-label="Toggle herd splitting"></button>
-              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/></svg></span>
-              <div class="dmeta"><h3>Herd splitting</h3><p>Milk solids lift from running split herds with Halter</p></div>
-              <div class="dval" data-dv="split">—</div>
-              <svg class="chev" data-chev="split" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </div>
-            <div class="dbody" data-body="split">
-              <div class="fields">
-                <div class="field col-2">
-                  <div class="field-top"><label for="split_pct">Milk solids uplift per cow</label>
-                    <span class="pill"><input type="number" id="split_pct" value="2" min="0" max="5" step="0.5"><span class="unit">%</span></span></div>
-                  <input type="range" class="rng" data-for="split_pct" min="0" max="5" step="0.5" value="2">
-                </div>
-              </div>
-              <div class="note">Research shows splitting the herd in half typically lifts milk solids ~2% per cow (sometimes ~1.5%). Applied per cow across the herd × milk price.</div>
-              <div class="calc-note" data-calc="split"></div>
-            </div>
-          </div>
-
           <div class="driver" data-driver="vehicles">
             <div class="dhead">
               <button class="dtog" data-tog="vehicles" aria-label="Toggle vehicles and maintenance"></button>
@@ -928,6 +869,27 @@
             </div>
           </div>
 
+          <div class="driver" data-driver="split">
+            <div class="dhead">
+              <button class="dtog" data-tog="split" aria-label="Toggle herd splitting"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="16" rx="1"/><rect x="14" y="4" width="7" height="16" rx="1"/></svg></span>
+              <div class="dmeta"><h3>Herd splitting</h3><p>Milk solids lift from running split herds with Halter</p></div>
+              <div class="dval" data-dv="split">—</div>
+              <svg class="chev" data-chev="split" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="split">
+              <div class="fields">
+                <div class="field col-2">
+                  <div class="field-top"><label for="split_pct">Milk solids uplift per cow</label>
+                    <span class="pill"><input type="number" id="split_pct" value="2" min="0" max="5" step="0.5"><span class="unit">%</span></span></div>
+                  <input type="range" class="rng" data-for="split_pct" min="0" max="5" step="0.5" value="2">
+                </div>
+              </div>
+              <div class="note">Research shows splitting the herd in half typically lifts milk solids ~2% per cow (sometimes ~1.5%). Applied per cow across the herd × milk price.</div>
+              <div class="calc-note" data-calc="split"></div>
+            </div>
+          </div>
+
           <div class="driver" data-driver="extra">
             <div class="dhead">
               <button class="dtog" data-tog="extra" aria-label="Toggle other"></button>
@@ -942,6 +904,44 @@
               <div class="extra-pad" id="extra-pad"></div>
               <div class="extra-pad-hint">Tap a calculation field and write the sum with your pen (e.g. 3000 − 1200 + 500) — iPad handwriting turns it into numbers and it works out the total as you go. Or use the keypad. Set each item to add value or be a cost.</div>
               <div class="calc-note" data-calc="extra"></div>
+            </div>
+          </div>
+
+          <!-- Winter crop -->
+          <div class="driver" data-driver="winter">
+            <div class="dhead">
+              <button class="dtog" data-tog="winter" aria-label="Toggle winter crop"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m2 12 10 0 10 0"/><path d="M12 2v20"/><path d="m4.93 4.93 14.14 14.14"/><path d="m19.07 4.93-14.14 14.14"/></svg></span>
+              <div class="dmeta"><h3>Winter crop</h3><p>Improved utilisation of kale and fodder crops</p></div>
+              <div class="dval" data-dv="winter">—</div>
+              <svg class="chev" data-chev="winter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="winter">
+              <div class="fields">
+                <div class="field">
+                  <div class="field-top"><label for="winter_days">Days on winter crop</label>
+                    <span class="pill"><input type="number" id="winter_days" value="70" min="10" max="150" step="1"><span class="unit">days</span></span></div>
+                  <input type="range" class="rng" data-for="winter_days" min="10" max="150" step="1" value="70">
+                </div>
+                <div class="field">
+                  <div class="field-top"><label for="winter_feed">Feed offered</label>
+                    <span class="pill"><input type="number" id="winter_feed" value="10" min="5" max="20" step="0.5"><span class="unit">kgDM/cow/day</span></span></div>
+                  <input type="range" class="rng" data-for="winter_feed" min="5" max="20" step="0.5" value="10">
+                </div>
+                <div class="field">
+                  <div class="field-top"><label for="winter_util">Utilisation improvement</label>
+                    <span class="pill"><input type="number" id="winter_util" value="10" min="2" max="25" step="1"><span class="unit">%</span></span></div>
+                  <input type="range" class="rng" data-for="winter_util" min="2" max="25" step="1" value="10">
+                </div>
+                <div class="selrow">
+                  <label for="winter_type">Measure saving as</label>
+                  <select id="winter_type">
+                    <option value="grow">Less crop to grow ($0.20/kgDM)</option>
+                    <option value="buy" selected>Less crop to buy ($0.35/kgDM)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="calc-note" data-calc="winter"></div>
             </div>
           </div>
 
@@ -1150,7 +1150,7 @@
 <script src="assets/vendor/jspdf.umd.min.js"></script>
 
 <script>
-  const DRIVERS = ['pasture','labour','quality','repro','lameness','winter','split','vehicles','extra'];
+  const DRIVERS = ['pasture','labour','quality','repro','lameness','vehicles','split','extra','winter'];
   const LABELS = {
     pasture: 'Pasture utilisation', quality: 'Pasture quality', repro: 'Reproduction',
     lameness: 'Lameness', labour: 'Labour', winter: 'Winter crop', split: 'Herd splitting',

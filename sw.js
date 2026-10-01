@@ -1,4 +1,4 @@
-const CACHE = 'halter-roi-v76';
+const CACHE = 'halter-roi-v77';
 const CORE = [
   '.',
   'index.html',
