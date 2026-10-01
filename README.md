@@ -224,9 +224,13 @@ It is a static site — drop the whole folder onto any static host:
 The service worker requires HTTPS (all the hosts above provide it), which every
 option above satisfies.
 
-## Put it on your iPad
+## Put it on your iPad or iPhone
 
-1. Open the hosted URL in **Safari** on the iPad.
+The layout is responsive, so it works on both — on a phone the two-column
+layout stacks into a single scrolling column, inputs go full-width, and the
+results card sits below. Same install steps on either device:
+
+1. Open the hosted URL in **Safari** on the iPad or iPhone.
 2. Tap the **Share** button → **Add to Home Screen**.
 3. Launch it from the home-screen icon. It opens full-screen (no browser chrome)
    and, after the first load, keeps working without a connection.

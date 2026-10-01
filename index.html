@@ -238,8 +238,21 @@
   }
   @media (max-width: 560px) {
     .fields { grid-template-columns: 1fr; }
-    .res-foot { grid-template-columns: 1fr; }
+    .res-foot { grid-template-columns: 1fr 1fr 1fr; }
     .hero { padding-top: 40px; }
+    .res-big { font-size: clamp(30px, 9vw, 44px); }
+    .layout { padding: 24px 0 64px; }
+    .panel { padding: 22px 18px; }
+    .results { padding: 24px 20px; }
+    select { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; }
+    .pill { min-width: 0; }
+    .meeting-bar .mb-field { min-width: 0; }
+    .veh-top select, .extra-bot select, .extra-type, .conc-type { min-width: 0; }
+    .conc-bot .pill, .conc-auto { min-width: 0; }
+    .extra-eq { min-width: 0; }
+    .extra-pad { max-width: none; }
+    .res-foot .stat { min-width: 0; }
+    .layout, .panel, .results, .sec, .fields, .field, .field-top, .selrow, .selrow-head, .radio-row, .drivers, .driver, .dbody, .dhead, .dmeta, .meeting-bar, .veh-list, .veh-row, .veh-costs, .veh-cost, .extra-row, .extra-calc, .conc-row, .conc-top, .conc-bot { min-width: 0; }
   }
 </style>
 <style>
