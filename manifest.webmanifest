@@ -1,7 +1,7 @@
 {
-  "name": "Halter Dairy ROI Calculator",
-  "short_name": "Halter ROI",
-  "description": "Halter NZ dairy ROI calculator — estimate the annual value of Halter across pasture, reproduction, lameness, labour and winter-crop drivers.",
+  "name": "Halter ROI Calculator AU",
+  "short_name": "Halter ROI AU",
+  "description": "Halter AU dairy ROI calculator — estimate the annual value of Halter across pasture, reproduction, lameness, labour and winter-crop drivers.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
