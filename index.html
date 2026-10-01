@@ -684,6 +684,38 @@
             </div>
           </div>
 
+          <!-- Labour -->
+          <div class="driver" data-driver="labour">
+            <div class="dhead">
+              <button class="dtog" data-tog="labour" aria-label="Toggle labour"></button>
+              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+              <div class="dmeta"><h3>Labour savings</h3><p>Time saved across daily farm tasks</p></div>
+              <div class="dval" data-dv="labour">—</div>
+              <svg class="chev" data-chev="labour" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <div class="dbody" data-body="labour">
+              <div class="fields">
+                <div class="field">
+                  <div class="field-top"><label for="hours_week">Hours saved per week</label>
+                    <span class="pill"><input type="number" id="hours_week" value="10" min="0" max="60" step="1"><span class="unit">hrs</span></span></div>
+                  <input type="range" class="rng" data-for="hours_week" min="0" max="60" step="1" value="10">
+                </div>
+                <div class="field">
+                  <div class="field-top"><label for="labour_rate">Labour rate</label>
+                    <span class="pill"><input type="number" id="labour_rate" value="32" min="20" max="60" step="1"><span class="unit">$/hr</span></span></div>
+                  <input type="range" class="rng" data-for="labour_rate" min="20" max="60" step="1" value="32">
+                </div>
+                <div class="field col-2">
+                  <div class="field-top"><label for="weeks">Weeks per season</label>
+                    <span class="pill"><input type="number" id="weeks" value="40" min="20" max="52" step="1"><span class="unit">weeks</span></span></div>
+                  <input type="range" class="rng" data-for="weeks" min="20" max="52" step="1" value="40">
+                </div>
+              </div>
+              <div class="note">Halter typically saves 5–15 hrs/week. Focus on labour redistribution rather than headcount reduction — especially on farms under 1,200 cows.</div>
+              <div class="calc-note" data-calc="labour"></div>
+            </div>
+          </div>
+
           <!-- Pasture quality -->
           <div class="driver" data-driver="quality">
             <div class="dhead">
@@ -791,38 +823,6 @@
               </div>
               <div class="note">Halter typically reduces lameness 30–50%. Only apply if the root cause is staff management or long walks — not laneway condition.</div>
               <div class="calc-note" data-calc="lameness"></div>
-            </div>
-          </div>
-
-          <!-- Labour -->
-          <div class="driver" data-driver="labour">
-            <div class="dhead">
-              <button class="dtog" data-tog="labour" aria-label="Toggle labour"></button>
-              <span class="dicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-              <div class="dmeta"><h3>Labour savings</h3><p>Time saved across daily farm tasks</p></div>
-              <div class="dval" data-dv="labour">—</div>
-              <svg class="chev" data-chev="labour" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-            </div>
-            <div class="dbody" data-body="labour">
-              <div class="fields">
-                <div class="field">
-                  <div class="field-top"><label for="hours_week">Hours saved per week</label>
-                    <span class="pill"><input type="number" id="hours_week" value="10" min="0" max="60" step="1"><span class="unit">hrs</span></span></div>
-                  <input type="range" class="rng" data-for="hours_week" min="0" max="60" step="1" value="10">
-                </div>
-                <div class="field">
-                  <div class="field-top"><label for="labour_rate">Labour rate</label>
-                    <span class="pill"><input type="number" id="labour_rate" value="32" min="20" max="60" step="1"><span class="unit">$/hr</span></span></div>
-                  <input type="range" class="rng" data-for="labour_rate" min="20" max="60" step="1" value="32">
-                </div>
-                <div class="field col-2">
-                  <div class="field-top"><label for="weeks">Weeks per season</label>
-                    <span class="pill"><input type="number" id="weeks" value="40" min="20" max="52" step="1"><span class="unit">weeks</span></span></div>
-                  <input type="range" class="rng" data-for="weeks" min="20" max="52" step="1" value="40">
-                </div>
-              </div>
-              <div class="note">Halter typically saves 5–15 hrs/week. Focus on labour redistribution rather than headcount reduction — especially on farms under 1,200 cows.</div>
-              <div class="calc-note" data-calc="labour"></div>
             </div>
           </div>
 
@@ -1150,7 +1150,7 @@
 <script src="assets/vendor/jspdf.umd.min.js"></script>
 
 <script>
-  const DRIVERS = ['pasture','quality','repro','lameness','labour','winter','split','vehicles','extra'];
+  const DRIVERS = ['pasture','labour','quality','repro','lameness','winter','split','vehicles','extra'];
   const LABELS = {
     pasture: 'Pasture utilisation', quality: 'Pasture quality', repro: 'Reproduction',
     lameness: 'Lameness', labour: 'Labour', winter: 'Winter crop', split: 'Herd splitting',
