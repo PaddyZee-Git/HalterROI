@@ -744,20 +744,6 @@
                     <span class="pill"><input type="number" id="nicr" value="2" min="0" max="10" step="0.5"><span class="unit">%</span></span></div>
                   <input type="range" class="rng" data-for="nicr" min="0" max="10" step="0.5" value="2">
                 </div>
-                <div class="selrow col-2">
-                  <label for="sgl_enable">Full AI + short gestation semen</label>
-                  <select id="sgl_enable"><option value="no" selected>No</option><option value="yes">Yes</option></select>
-                </div>
-                <div class="field" data-sgl style="display:none">
-                  <div class="field-top"><label for="sgl_pct">Herd mated with SGL semen</label>
-                    <span class="pill"><input type="number" id="sgl_pct" value="15" min="5" max="40" step="1"><span class="unit">%</span></span></div>
-                  <input type="range" class="rng" data-for="sgl_pct" min="5" max="40" step="1" value="15">
-                </div>
-                <div class="field" data-sgl style="display:none">
-                  <div class="field-top"><label for="bull_save">Bull cost saving</label>
-                    <span class="pill"><input type="number" id="bull_save" value="10000" min="0" max="80000" step="500"><span class="unit">$</span></span></div>
-                  <input type="range" class="rng" data-for="bull_save" min="0" max="80000" step="500" value="10000">
-                </div>
               </div>
               <div class="note">Every 1% gain in 6WICR = $4/cow · every 1% drop in NICR = $10/cow (DairyNZ InCalf Calculator).</div>
               <div class="calc-note" data-calc="repro"></div>
@@ -1226,12 +1212,6 @@
     document.querySelector('[data-chev="'+name+'"]').classList.toggle('open', open);
   }
 
-  /* --- SGL semen sub-fields --- */
-  document.getElementById('sgl_enable').addEventListener('change', e => {
-    document.querySelectorAll('[data-sgl]').forEach(el => el.style.display = e.target.value === 'yes' ? '' : 'none');
-    calculate();
-  });
-
   document.querySelectorAll('select, input[type=radio]').forEach(el => el.addEventListener('change', calculate));
 
   /* --- Driver math (unchanged from source) --- */
@@ -1256,11 +1236,8 @@
   }
   function calcRepro() {
     if (!state.repro) return 0;
-    const cows = v('cows'), mp = v('milkprice');
-    let val = v('sixwicr') * A('a_6wicr', 4) * cows + v('nicr') * A('a_nicr', 10) * cows;
-    if (document.getElementById('sgl_enable').value === 'yes')
-      val += cows * (v('sgl_pct') / 100) * 10 * 1.5 * mp + v('bull_save');
-    return val;
+    const cows = v('cows');
+    return v('sixwicr') * A('a_6wicr', 4) * cows + v('nicr') * A('a_nicr', 10) * cows;
   }
   function calcLameness() {
     if (!state.lameness) return 0;
@@ -1600,14 +1577,8 @@
     if (k === 'repro') {
       const w6 = A('a_6wicr', 4), wn = A('a_nicr', 10);
       const a = v('sixwicr') * w6 * cows, b = v('nicr') * wn * cows;
-      let s = '6WICR: ' + v('sixwicr') + ' × $' + w6 + ' × ' + nz(cows) + ' = ' + fmt(a) + ' · NICR: ' + v('nicr') + ' × $' + wn + ' × ' + nz(cows) + ' = ' + fmt(b);
-      let tot = a + b;
-      if (document.getElementById('sgl_enable').value === 'yes') {
-        const sgl = cows * (v('sgl_pct') / 100) * 10 * 1.5 * mp, bull = v('bull_save');
-        s += ' · SGL: ' + nz(cows) + ' × ' + v('sgl_pct') + '% × 10 × 1.5 × $' + mp.toFixed(2) + ' = ' + fmt(sgl) + ' + bull ' + fmt(bull);
-        tot += sgl + bull;
-      }
-      return s + ' = ' + fmt(tot);
+      const s = '6WICR: ' + v('sixwicr') + ' × $' + w6 + ' × ' + nz(cows) + ' = ' + fmt(a) + ' · NICR: ' + v('nicr') + ' × $' + wn + ' × ' + nz(cows) + ' = ' + fmt(b);
+      return s + ' = ' + fmt(a + b);
     }
     if (k === 'lameness') {
       const lc = getLameCost(), cases = v('lameness_cases');
@@ -1991,8 +1962,6 @@
         setOpen(k, on);
       });
     }
-    const sglOn = document.getElementById('sgl_enable').value === 'yes';
-    document.querySelectorAll('[data-sgl]').forEach(el => el.style.display = sglOn ? '' : 'none');
     if (Array.isArray(s.vehicles)) {
       vehicles = s.vehicles.map(r => {
         const type = r.type || 'quad';
