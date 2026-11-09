@@ -700,16 +700,19 @@
             <div class="dbody" data-body="labour">
               <div class="fields">
                 <div class="field">
+                  <div class="field-top"><label for="hours_day">Hours saved per day</label>
+                    <span class="pill"><input type="number" id="hours_day" value="1.5" min="0" max="12" step="0.25"><span class="unit">hrs/day</span></span></div>
+                </div>
+                <div class="field">
                   <div class="field-top"><label for="hours_week">Hours saved per week</label>
-                    <span class="pill"><input type="number" id="hours_week" value="10" min="0" max="60" step="1"><span class="unit">hrs</span></span></div>
-                  <input type="range" class="rng" data-for="hours_week" min="0" max="60" step="1" value="10">
+                    <span class="pill"><input type="number" id="hours_week" value="10.5" min="0" max="84" step="0.5"><span class="unit">hrs/wk</span></span></div>
                 </div>
                 <div class="field">
                   <div class="field-top"><label for="labour_rate">Labour rate</label>
                     <span class="pill"><input type="number" id="labour_rate" value="32" min="20" max="60" step="1"><span class="unit">$/hr</span></span></div>
                   <input type="range" class="rng" data-for="labour_rate" min="20" max="60" step="1" value="32">
                 </div>
-                <div class="field col-2">
+                <div class="field">
                   <div class="field-top"><label for="weeks">Weeks per season</label>
                     <span class="pill"><input type="number" id="weeks" value="40" min="20" max="52" step="1"><span class="unit">weeks</span></span></div>
                   <input type="range" class="rng" data-for="weeks" min="20" max="52" step="1" value="40">
@@ -1916,6 +1919,19 @@
     calculate();
     editingLift = false;
   }
+
+  // Labour hours: per-day and per-week are linked (7 days/week). Editing one
+  // fills the other. hours_week is what the calculation uses.
+  function syncHoursFromDay() {
+    const d = parseFloat(document.getElementById('hours_day').value);
+    document.getElementById('hours_week').value = isNaN(d) ? '' : +(d * 7).toFixed(2);
+    calculate();
+  }
+  function syncHoursFromWeek() {
+    const w = parseFloat(document.getElementById('hours_week').value);
+    document.getElementById('hours_day').value = isNaN(w) ? '' : +(w / 7).toFixed(2);
+    calculate();
+  }
   function updatePastureLink() {
     if (editingLift) return;
     const dm = v('dm_current');
@@ -2007,6 +2023,9 @@
     renderConc();
     const notesEl = document.getElementById('meeting_notes');
     if (notesEl) notesEl.value = s.notes || '';
+    // keep the linked per-day labour box consistent with the restored per-week value
+    const hw = parseFloat(document.getElementById('hours_week').value);
+    if (!isNaN(hw)) document.getElementById('hours_day').value = +(hw / 7).toFixed(2);
     calculate();
   }
 
@@ -2348,6 +2367,9 @@
   document.querySelectorAll('input[name=pkg], input[name=term]').forEach(el => el.addEventListener('change', applyPackagePrice));
   document.getElementById('pasture_lift').addEventListener('input', fromLift);
   document.getElementById('pasture_lift_rng').addEventListener('input', () => { document.getElementById('pasture_lift').value = document.getElementById('pasture_lift_rng').value; fromLift(); });
+  document.getElementById('hours_day').addEventListener('input', syncHoursFromDay);
+  document.getElementById('hours_week').addEventListener('input', syncHoursFromWeek);
+  document.getElementById('collar').addEventListener('input', calculate);
   document.getElementById('meeting_name').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); saveMeeting(); }
   });
