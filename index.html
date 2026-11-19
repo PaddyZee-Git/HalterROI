@@ -125,6 +125,18 @@
   }
   .hint { font-size: 11px; color: var(--halter-graphite); margin-top: 8px; line-height: 1.4; }
 
+  /* on/off switch (e.g. Young stock) */
+  .switch-row { display: inline-flex; align-items: center; gap: 10px; margin-top: 12px; cursor: pointer; user-select: none; }
+  .switch-row input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .switch { position: relative; width: 40px; height: 23px; border-radius: 999px; background: var(--halter-mist); transition: background .15s var(--ease); flex: none; }
+  .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 19px; height: 19px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .15s var(--ease); }
+  .switch-row input:checked + .switch { background: var(--halter-green); }
+  .switch-row input:checked + .switch::after { transform: translateX(17px); }
+  .switch-row input:focus-visible + .switch { outline: 2px solid var(--halter-cactus); outline-offset: 2px; }
+  .switch-txt { font-size: 13px; font-weight: 500; color: var(--halter-ink); }
+  #ys-field .pill { transition: opacity .15s var(--ease); }
+  #ys-field.off .pill { opacity: .45; }
+
   /* ---------- Selects + radios ---------- */
   .selrow { padding: 8px 0 14px; }
   .selrow.col-2 { grid-column: 1 / -1; }
@@ -584,6 +596,12 @@
               <span class="pill"><input type="number" id="dm_current" value="13500" min="5000" max="25000" step="100"><span class="unit">kgDM/ha</span></span></div>
             <input type="range" class="rng" data-for="dm_current" min="5000" max="25000" step="100" value="13500">
             <div class="hint">Current pasture harvested. Used by the pasture utilisation and quality drivers.</div>
+          </div>
+          <div class="field" id="ys-field">
+            <div class="field-top"><label for="ys_count">Young stock</label>
+              <span class="pill"><input type="number" id="ys_count" value="0" min="0" max="3000" step="10" disabled><span class="unit">head</span></span></div>
+            <label class="switch-row"><input type="checkbox" id="ys_enable"><span class="switch" aria-hidden="true"></span><span class="switch-txt">Include young stock</span></label>
+            <div class="hint">Collared replacements/heifers not yet milking — added to the Halter cost only, never to the value calculations.</div>
           </div>
           <div class="selrow col-2">
             <div class="selrow-head">
@@ -1173,6 +1191,10 @@
   const A = (id, d) => { const el = document.getElementById(id); return (el && el.value !== '') ? parseFloat(el.value) : d; };
   const getFCE = () => parseFloat(document.querySelector('input[name="fce"]:checked').value);
   const getLameCost = () => parseFloat(document.querySelector('input[name="lamecost"]:checked').value);
+  // Collared animals for the Halter cost = milking cows + (young stock, if included).
+  // Young stock are collared and billed, but never feed the value calculations.
+  const youngStock = () => { const el = document.getElementById('ys_enable'); return (el && el.checked) ? v('ys_count') : 0; };
+  const collaredCows = () => v('cows') + youngStock();
 
   /* --- Slider <-> number sync --- */
   document.querySelectorAll('input.rng').forEach(rng => {
@@ -1274,7 +1296,7 @@
 
     const gross = DRIVERS.reduce((a, k) => a + vals[k], 0);
     const cows = v('cows'), ha = v('ha'), collar = v('collar');
-    const subscription = cows * collar * 12;
+    const subscription = collaredCows() * collar * 12;
     const connectivity = (typeof calcConnectivity === 'function' ? calcConnectivity() : 0);
     const annualCost = subscription + connectivity;
     const concess = (typeof concTotal === 'function' ? concTotal() : 0);
@@ -1372,7 +1394,7 @@
     { v: '3', name: '3 months free' },
     { v: '6', name: '6 months free' }
   ];
-  function concMonthlySub() { return v('cows') * v('collar'); }
+  function concMonthlySub() { return collaredCows() * v('collar'); }
   function concValue(r) { return r.kind === 'months' ? (Number(r.months) || 0) * concMonthlySub() : (Number(r.amount) || 0); }
   function concLabel(r) {
     const t = (r.label || '').trim();
@@ -1480,7 +1502,9 @@
     const collar = v('collar');
     let s = PKG_LABELS[selectedPkg()] + ' · ' + TERM_LABELS[selectedTerm()] + ' — $' + collar.toFixed(2) + ' AUD per collar/month, excl. GST';
     if (Math.abs(collar - price) > 0.001) s += ' · custom price';
-    s += '. Annual investment = ' + v('cows').toLocaleString('en-NZ') + ' × $' + collar.toFixed(2) + ' × 12 = ' + fmt(v('cows') * collar * 12);
+    const collared = collaredCows();
+    const ys = youngStock();
+    s += '. Annual investment = ' + collared.toLocaleString('en-NZ') + (ys ? ' collared (' + v('cows').toLocaleString('en-NZ') + ' milking + ' + ys.toLocaleString('en-NZ') + ' young stock)' : '') + ' × $' + collar.toFixed(2) + ' × 12 = ' + fmt(collared * collar * 12);
     el.textContent = s;
   }
 
@@ -1899,6 +1923,14 @@
     document.getElementById('hours_day').value = isNaN(w) ? '' : +(w / 7).toFixed(2);
     calculate();
   }
+
+  // Young stock: collared animals added to the Halter cost only (never the value calcs).
+  function syncYoungStock(silent) {
+    const on = document.getElementById('ys_enable').checked;
+    document.getElementById('ys-field').classList.toggle('off', !on);
+    document.getElementById('ys_count').disabled = !on;
+    if (!silent) calculate();
+  }
   function updatePastureLink() {
     if (editingLift) return;
     const dm = v('dm_current');
@@ -1916,6 +1948,8 @@
     document.querySelectorAll('select').forEach(el => { if (el.id) selects[el.id] = el.value; });
     const radios = {};
     document.querySelectorAll('input[type=radio]').forEach(el => { if (el.checked) radios[el.name] = el.value; });
+    const checks = {};
+    document.querySelectorAll('input[type=checkbox]').forEach(el => { if (el.id) checks[el.id] = el.checked; });
     const results = {
       net: document.getElementById('grand-total').textContent,
       gross: document.getElementById('led-gross').textContent,
@@ -1925,7 +1959,7 @@
       roi: document.getElementById('stat-roi').textContent
     };
     const notesEl = document.getElementById('meeting_notes');
-    return { numbers, selects, radios, drivers: Object.assign({}, state), vehicles: vehicles.map(r => Object.assign({}, r)), extras: extras.map(r => Object.assign({}, r)), concessions: concessions.map(r => Object.assign({}, r)), notes: notesEl ? notesEl.value : '', results };
+    return { numbers, selects, radios, checks, drivers: Object.assign({}, state), vehicles: vehicles.map(r => Object.assign({}, r)), extras: extras.map(r => Object.assign({}, r)), concessions: concessions.map(r => Object.assign({}, r)), notes: notesEl ? notesEl.value : '', results };
   }
 
   function applyState(s) {
@@ -1941,6 +1975,11 @@
       const el = document.getElementById(id);
       if (el) el.value = s.selects[id];
     });
+    Object.keys(s.checks || {}).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.checked = !!s.checks[id];
+    });
+    if (typeof syncYoungStock === 'function') syncYoungStock(true);
     if (s.radios) {
       Object.keys(s.radios).forEach(name => {
         const r = document.querySelector('input[name="' + name + '"][value="' + s.radios[name] + '"]');
@@ -2190,7 +2229,7 @@
       bd.appendChild(row);
     });
 
-    const sub = v('cows') * v('collar') * 12;
+    const sub = collaredCows() * v('collar') * 12;
     const conn = (typeof calcConnectivity === 'function' ? calcConnectivity() : 0);
     const concess = (typeof concTotal === 'function' ? concTotal() : 0);
     const setup = (typeof calcTowers === 'function' ? calcTowers() : 0) + (typeof calcFreight === 'function' ? calcFreight() : 0);
@@ -2236,15 +2275,18 @@
     }
 
     const kv = rep.querySelector('[data-kv]');
-    [
-      ['Milking cows', pv('cows') + ' cows'],
+    const ysOn = document.getElementById('ys_enable').checked && v('ys_count') > 0;
+    const kvPairs = [['Milking cows', pv('cows') + ' cows']];
+    if (ysOn) kvPairs.push(['Young stock', pv('ys_count') + ' head · collared']);
+    kvPairs.push(
       ['Milk solids per cow', pv('kgms_cow') + ' kgMS'],
       ['Effective area', pv('ha') + ' ha'],
       ['Milk price', '$' + pv('milkprice') + ' /kgMS'],
       ['DM harvested', pv('dm_current') + ' kgDM/ha'],
       ['Halter package', PKG_LABELS[selectedPkg()] + ' · ' + TERM_LABELS[selectedTerm()]],
       ['Halter cost', '$' + pv('collar') + ' /cow/month']
-    ].forEach(pair => {
+    );
+    kvPairs.forEach(pair => {
       const c = document.createElement('span');
       c.className = 'pr-chip';
       c.innerHTML = '<i></i>';
@@ -2335,6 +2377,9 @@
   document.getElementById('hours_day').addEventListener('input', syncHoursFromDay);
   document.getElementById('hours_week').addEventListener('input', syncHoursFromWeek);
   document.getElementById('collar').addEventListener('input', calculate);
+  document.getElementById('ys_enable').addEventListener('change', () => syncYoungStock());
+  document.getElementById('ys_count').addEventListener('input', calculate);
+  syncYoungStock(true);
   document.getElementById('meeting_name').addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); saveMeeting(); }
   });

@@ -20,6 +20,17 @@ Below the field, a read-only **Herd production** caption shows total milk solids
 (Milking cows × kgMS/cow) — baseline farm context that does not affect the ROI.
 It also prints in the report.
 
+## Young stock
+
+Next to **DM harvested** is a **Young stock** field with an **Include young
+stock** on/off switch. Young stock are collared animals not yet in the milking
+herd (replacements/heifers). When switched on, the head count is added to the
+**Halter cost only** — the collar subscription (and any "months free"
+concession) is billed on `milking cows + young stock` — but young stock are
+**never** included in any value-driver calculation, which always use the milking
+herd. Off by default; the count, the switch state, and the figure persist in
+saved meetings and print in the report when included.
+
 ## Pasture lift (% ↔ kgDM/ha)
 
 In the Pasture utilisation driver, "Additional pasture harvested" (kgDM/ha) is
