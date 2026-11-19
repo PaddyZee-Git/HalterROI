@@ -125,7 +125,7 @@
   }
   .hint { font-size: 11px; color: var(--halter-graphite); margin-top: 8px; line-height: 1.4; }
 
-  /* on/off switch (e.g. Young stock) */
+  /* on/off switch (e.g. Youngstock) */
   .switch-row { display: inline-flex; align-items: center; gap: 10px; margin-top: 12px; cursor: pointer; user-select: none; }
   .switch-row input { position: absolute; opacity: 0; width: 0; height: 0; }
   .switch { position: relative; width: 40px; height: 23px; border-radius: 999px; background: var(--halter-mist); transition: background .15s var(--ease); flex: none; }
@@ -598,9 +598,9 @@
             <div class="hint">Current pasture harvested. Used by the pasture utilisation and quality drivers.</div>
           </div>
           <div class="field" id="ys-field">
-            <div class="field-top"><label for="ys_count">Young stock</label>
+            <div class="field-top"><label for="ys_count">Youngstock</label>
               <span class="pill"><input type="number" id="ys_count" value="0" min="0" max="3000" step="10" disabled><span class="unit">head</span></span></div>
-            <label class="switch-row"><input type="checkbox" id="ys_enable"><span class="switch" aria-hidden="true"></span><span class="switch-txt">Include young stock</span></label>
+            <label class="switch-row"><input type="checkbox" id="ys_enable"><span class="switch" aria-hidden="true"></span><span class="switch-txt">Include youngstock</span></label>
             <div class="hint">Collared replacements/heifers not yet milking — added to the Halter cost only, never to the value calculations.</div>
           </div>
           <div class="selrow col-2">
@@ -1191,8 +1191,8 @@
   const A = (id, d) => { const el = document.getElementById(id); return (el && el.value !== '') ? parseFloat(el.value) : d; };
   const getFCE = () => parseFloat(document.querySelector('input[name="fce"]:checked').value);
   const getLameCost = () => parseFloat(document.querySelector('input[name="lamecost"]:checked').value);
-  // Collared animals for the Halter cost = milking cows + (young stock, if included).
-  // Young stock are collared and billed, but never feed the value calculations.
+  // Collared animals for the Halter cost = milking cows + (youngstock, if included).
+  // Youngstock are collared and billed, but never feed the value calculations.
   const youngStock = () => { const el = document.getElementById('ys_enable'); return (el && el.checked) ? v('ys_count') : 0; };
   const collaredCows = () => v('cows') + youngStock();
 
@@ -1504,7 +1504,7 @@
     if (Math.abs(collar - price) > 0.001) s += ' · custom price';
     const collared = collaredCows();
     const ys = youngStock();
-    s += '. Annual investment = ' + collared.toLocaleString('en-NZ') + (ys ? ' collared (' + v('cows').toLocaleString('en-NZ') + ' milking + ' + ys.toLocaleString('en-NZ') + ' young stock)' : '') + ' × $' + collar.toFixed(2) + ' × 12 = ' + fmt(collared * collar * 12);
+    s += '. Annual investment = ' + collared.toLocaleString('en-NZ') + (ys ? ' collared (' + v('cows').toLocaleString('en-NZ') + ' milking + ' + ys.toLocaleString('en-NZ') + ' youngstock)' : '') + ' × $' + collar.toFixed(2) + ' × 12 = ' + fmt(collared * collar * 12);
     el.textContent = s;
   }
 
@@ -1924,7 +1924,7 @@
     calculate();
   }
 
-  // Young stock: collared animals added to the Halter cost only (never the value calcs).
+  // Youngstock: collared animals added to the Halter cost only (never the value calcs).
   function syncYoungStock(silent) {
     const on = document.getElementById('ys_enable').checked;
     document.getElementById('ys-field').classList.toggle('off', !on);
@@ -2277,7 +2277,7 @@
     const kv = rep.querySelector('[data-kv]');
     const ysOn = document.getElementById('ys_enable').checked && v('ys_count') > 0;
     const kvPairs = [['Milking cows', pv('cows') + ' cows']];
-    if (ysOn) kvPairs.push(['Young stock', pv('ys_count') + ' head · collared']);
+    if (ysOn) kvPairs.push(['Youngstock', pv('ys_count') + ' head · collared']);
     kvPairs.push(
       ['Milk solids per cow', pv('kgms_cow') + ' kgMS'],
       ['Effective area', pv('ha') + ' ha'],
