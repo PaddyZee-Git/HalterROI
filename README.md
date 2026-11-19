@@ -102,8 +102,8 @@ the working line, and the breakdown all show the signed figure, and the items
 
 A collapsible "Assumptions" section exposes the benchmark constants used by the
 drivers so they can be adjusted per farm/region: 6-week in-calf value ($/cow per
-1%), not-in-calf value ($/cow per 1%), MJME per kgMS, pasture direct profit
-($/tDM), and winter-crop grow/buy rates ($/kgDM). Changes flow through the
+1%), not-in-calf value ($/cow per 1%), MJME per kgMS, and winter-crop grow/buy
+rates ($/kgDM). Changes flow through the
 calculations and the "how this is calculated" working lines, and persist in
 saved meetings.
 

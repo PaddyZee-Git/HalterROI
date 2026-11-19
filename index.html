@@ -661,7 +661,6 @@
                     <option value="supplement">Reduce imported supplement</option>
                     <option value="kgms" selected>Additional kgMS</option>
                     <option value="stocking">Increased stocking rate</option>
-                    <option value="profit">Direct profit (DairyNZ $350/tDM)</option>
                   </select>
                 </div>
                 <div class="selrow">
@@ -1032,7 +1031,6 @@
             <div class="field"><div class="field-top"><label for="a_6wicr">6-week in-calf value</label><span class="pill"><input type="number" id="a_6wicr" value="4" min="0" max="50" step="0.5"><span class="unit">$/cow/%</span></span></div></div>
             <div class="field"><div class="field-top"><label for="a_nicr">Not-in-calf value</label><span class="pill"><input type="number" id="a_nicr" value="10" min="0" max="50" step="0.5"><span class="unit">$/cow/%</span></span></div></div>
             <div class="field"><div class="field-top"><label for="a_mjme_kgms">MJME per kgMS</label><span class="pill"><input type="number" id="a_mjme_kgms" value="80" min="40" max="120" step="1"><span class="unit">MJME</span></span></div></div>
-            <div class="field"><div class="field-top"><label for="a_pasture_profit">Pasture direct profit</label><span class="pill"><input type="number" id="a_pasture_profit" value="350" min="0" max="1000" step="10"><span class="unit">$/tDM</span></span></div></div>
             <div class="field"><div class="field-top"><label for="a_winter_grow">Winter crop — grow</label><span class="pill"><input type="number" id="a_winter_grow" value="0.20" min="0" max="2" step="0.01"><span class="unit">$/kgDM</span></span></div></div>
             <div class="field"><div class="field-top"><label for="a_winter_buy">Winter crop — buy</label><span class="pill"><input type="number" id="a_winter_buy" value="0.35" min="0" max="2" step="0.01"><span class="unit">$/kgDM</span></span></div></div>
           </div>
@@ -1222,7 +1220,6 @@
     if (use === 'supplement') return total / 1000 * v('supp_cost');
     if (use === 'kgms')       return (total / getFCE()) * mp;
     if (use === 'stocking')   return (total / v('dm_per_cow')) * v('kgms_cow') * mp;
-    if (use === 'profit')     return extra * A('a_pasture_profit', 350) * ha / 1000;
     return 0;
   }
   function calcQuality() {
@@ -1564,8 +1561,7 @@
       if (use === 'supplement') { const sc = v('supp_cost'); return base + ' = ' + nz(total / 1000) + ' tDM × $' + nz(sc) + '/tDM = ' + fmt(total / 1000 * sc); }
       if (use === 'kgms') { const fce = getFCE(); return base + ' ÷ ' + fce + ' kgDM/kgMS = ' + nz(total / fce) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(total / fce * mp); }
       if (use === 'stocking') { const kc = v('kgms_cow'), dmc = v('dm_per_cow'); return base + ' ÷ ' + nz(dmc) + ' kgDM/cow = ' + nz(total / dmc) + ' cows × ' + nz(kc) + ' kgMS × $' + mp.toFixed(2) + ' = ' + fmt(total / dmc * kc * mp); }
-      const pp = A('a_pasture_profit', 350);
-      return base + ' = ' + nz(total / 1000) + ' tDM × $' + nz(pp) + '/tDM = ' + fmt(extra * pp * ha / 1000);
+      return base;
     }
     if (k === 'quality') {
       const totalMJME = v('dm_current') * ha * v('mjme_gain'), use = document.getElementById('quality_use').value;
